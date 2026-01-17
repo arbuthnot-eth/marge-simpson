@@ -1,0 +1,16 @@
+# OS / filesystem noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# VS Code (optional - keep repo clean)
+.vscode/
+
+# Node / Python / misc (optional; safe defaults)
+node_modules/
+__pycache__/
+*.pyc
+.env
