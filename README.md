@@ -1,4 +1,6 @@
-# Marge Simpson - sMITten Recursive Context 🛠️
+# Marge Simpson - sMITten Recursive Context
+
+# NOW with Automated Testing 🛠️
 
 <p float="left">
   <img src="assets/2p1f.png" width="96%" />
