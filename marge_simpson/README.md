@@ -35,6 +35,7 @@ Use `--skip-if-no-tests` (bash) or `-SkipIfNoTests` (PowerShell) to exit cleanly
 |--------|-------------|
 | `verify.ps1` / `verify.sh` | Runs tests (auto-detect or config-based) |
 | `cleanup.ps1` / `cleanup.sh` | Cleans old logs, suggests archiving |
+| `test-marge.ps1` / `test-marge.sh` | Self-test suite (validates Marge scripts work correctly) |
 
 ## Configuration
 

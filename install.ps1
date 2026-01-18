@@ -1,4 +1,3 @@
-\
 <#
 install.ps1
 Copies the drop-in `marge_simpson` folder into the current directory (your project root).
