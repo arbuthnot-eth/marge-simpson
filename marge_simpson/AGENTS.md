@@ -38,7 +38,7 @@ Before any of the following, stop and request approval with a short plan + risks
 - For EACH issue, verification is a hard gate.
 - Do NOT move to the next issue until the current issue has passing verification evidence.
 - Prefer adding an automated regression test. If not feasible quickly, add a deterministic repro script/steps.
-- Always run the repo verification runner (replace `marge_simpson` with the actual folder name):
+- Always run the repo verification runner:
   - macOS/Linux: `./marge_simpson/verify.sh fast`
   - Windows (PowerShell): `./marge_simpson/verify.ps1 fast`
   - Use `--skip-if-no-tests` (bash) or `-SkipIfNoTests` (PowerShell) for repos with no tests yet.
@@ -106,7 +106,6 @@ needed capability to run `verify` (one question max).
 - Every task must reference an ID, and every issue entry must use an ID.
 
 ### Source-of-truth files (required)
-Replace `marge_simpson` with the actual folder name (e.g., `marge_simpson`):
 - `marge_simpson/tasklist.md` = what's left / what's in progress / what's done
 - `marge_simpson/assessment.md` = findings + root cause notes + verification notes
 - `marge_simpson/instructions_log.md` = append-only log of new standing instructions from the user

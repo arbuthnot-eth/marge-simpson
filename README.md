@@ -19,8 +19,6 @@
 
 That's it!
 
-> **Note:** You can rename the folder, but if you do, update the folder name in `prompt_templates/*.md` to match. The scripts auto-detect their folder name, but the prompts are copy-paste templates that need explicit paths.
-
 
 ## Your workflow (exactly how you use it)
 
