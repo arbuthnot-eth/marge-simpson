@@ -154,5 +154,53 @@ marge_simpson/
 
 ---
 
+## For Contributors: Creating a meta_marge
+
+Want to improve Marge itself? Use the **meta development workflow**:
+
+### What's the difference?
+| Folder | Purpose |
+|--------|---------|
+| `marge_simpson/` | **Template for end users** - this gets copied to other repos |
+| `meta_marge/` | **Development instance** - used to improve Marge itself |
+
+### Quick Start
+```powershell
+# Windows PowerShell
+.\convert-to-meta.ps1
+```
+```bash
+# macOS/Linux
+./convert-to-meta.sh
+```
+
+This creates `meta_marge/` by copying from `marge_simpson/` and updating internal references.
+
+### Development Workflow
+1. Run `convert-to-meta.ps1` (or `.sh`) to create/refresh `meta_marge/`
+2. Use the prompts but reference `meta_marge` instead of `marge_simpson`
+3. Make improvements, test with `./meta_marge/test-marge.ps1`
+4. When satisfied, copy changes back to `marge_simpson/` (the template)
+
+### Key Files
+```
+meta_marge/
+  AGENTS.md               # Edit this to change assistant behavior
+  test-marge.ps1          # Self-test suite (15 tests)
+  verify.ps1              # Verification runner
+  cleanup.ps1             # Log cleanup utility
+```
+
+### Testing Your Changes
+```powershell
+# Run the self-test suite
+.\meta_marge\test-marge.ps1
+
+# Run verification
+.\meta_marge\verify.ps1 fast -SkipIfNoTests
+```
+
+---
+
 ## License
 Do whatever you want with it. Fork it, rename it, ship it with your team.
