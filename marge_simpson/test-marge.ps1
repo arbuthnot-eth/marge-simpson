@@ -216,7 +216,7 @@ Test-Assert "cleanup.ps1 exits 0 in preview mode" { $cleanupExitCode -eq 0 }
 Test-Assert "Output shows PREVIEW MODE" { ($cleanupResult -join "`n") -match "PREVIEW" }
 
 # Test 6: AGENTS.md content validation
-Write-Section "Test Suite 6/6: AGENTS.md Content Validation"
+Write-Section "Test Suite 6/7: AGENTS.md Content Validation"
 $agentsPath = Join-Path $MsDir "AGENTS.md"
 $agentsContent = Get-Content -Path $agentsPath -Raw
 
@@ -238,6 +238,57 @@ if ($MsFolderName -eq "meta_marge") {
     Test-Assert "AGENTS.md contains meta audit exclusion rule" {
         $agentsContent -match "excluded from audits"
     }
+}
+
+# Test 7: Expert Integration Validation
+Write-Section "Test Suite 7/7: Expert Integration Validation"
+
+# Check EXPERT_REGISTRY.md exists
+$expertRegistryPath = Join-Path $MsDir "EXPERT_REGISTRY.md"
+$expertRegistryExists = Test-Path $expertRegistryPath
+Test-Assert "EXPERT_REGISTRY.md exists" { $expertRegistryExists }
+
+if ($expertRegistryExists) {
+    $expertContent = Get-Content -Path $expertRegistryPath -Raw
+    
+    # Validate expert structure - each expert should have these key fields
+    Test-Assert "EXPERT_REGISTRY.md contains Title field" {
+        $expertContent -match "\*\*Title\*\*:"
+    }
+    Test-Assert "EXPERT_REGISTRY.md contains Experience field" {
+        $expertContent -match "\*\*Experience\*\*:"
+    }
+    Test-Assert "EXPERT_REGISTRY.md contains Knowledge Domains" {
+        $expertContent -match "\*\*Knowledge Domains\*\*:"
+    }
+    Test-Assert "EXPERT_REGISTRY.md contains Behavioral Patterns" {
+        $expertContent -match "\*\*Behavioral Patterns\*\*:"
+    }
+    Test-Assert "EXPERT_REGISTRY.md contains Role Boundaries" {
+        $expertContent -match "\*\*Role Boundaries\*\*:"
+    }
+    
+    # Validate key experts exist (these are critical for the system)
+    Test-Assert "Principal Systems Architect expert exists" {
+        $expertContent -match "Principal Systems Architect"
+    }
+    Test-Assert "Security & Compliance Architect expert exists" {
+        $expertContent -match "Security.*Compliance.*Architect"
+    }
+    Test-Assert "Senior QA Engineer expert exists" {
+        $expertContent -match "Senior QA Engineer"
+    }
+    
+    # Validate AGENTS.md has expert integration
+    Test-Assert "AGENTS.md contains Expert Integration section" {
+        $agentsContent -match "Expert Integration"
+    }
+    Test-Assert "AGENTS.md references EXPERT_REGISTRY.md" {
+        $agentsContent -match "EXPERT_REGISTRY\.md"
+    }
+} else {
+    # Skip expert-specific tests if registry doesn't exist
+    Write-Host "    [SKIP] Expert structure tests - EXPERT_REGISTRY.md not found" -ForegroundColor DarkYellow
 }
 
 # Summary
