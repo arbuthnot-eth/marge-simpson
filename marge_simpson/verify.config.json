@@ -1,4 +1,4 @@
 {
-  "fast": [],
-  "full": []
+  "fast": ["powershell -ExecutionPolicy Bypass -File ./marge_simpson/test-marge.ps1"],
+  "full": ["powershell -ExecutionPolicy Bypass -File ./marge_simpson/test-marge.ps1"]
 }

@@ -14,11 +14,12 @@
 </p>
 
 ## Install (30 seconds)
-1) Copy the **`<folder>/`** folder into your repo/workspace root.
-2) Optionally rename the folder to anything you like (e.g., `marge_for_myproject/`).
-3) Run the prompts below.
+1) Copy the **`marge_simpson/`** folder into your repo/workspace root.
+2) Run the prompts below.
 
-That's it! The scripts auto-detect their folder name.
+That's it!
+
+> **Note:** You can rename the folder, but if you do, update the folder name in `prompt_templates/*.md` to match. The scripts auto-detect their folder name, but the prompts are copy-paste templates that need explicit paths.
 
 
 ## Your workflow (exactly how you use it)
@@ -28,19 +29,19 @@ That's it! The scripts auto-detect their folder name.
 Paste this entire prompt into your assistant chat:
 
 ```txt
-Read the AGENTS.md file in this folder and follow it.
+Read the AGENTS.md file in the marge_simpson folder and follow it.
 
 Run a system-wide audit of this workspace/repo.
 - Read and understand the architecture and major workflows.
 - Identify correctness issues, risky patterns, and high-impact improvements.
 - Do not break intended functionality.
 
-Update/create tracking docs (use the actual folder name where AGENTS.md lives):
-- <folder>/assessment.md (snapshot + findings + new MS issues)
-- <folder>/tasklist.md (prioritized tasks with DoD + verification)
-- <folder>/instructions_log.md (append any new standing instructions I give)
+Update/create tracking docs:
+- marge_simpson/assessment.md (snapshot + findings + new MS issues)
+- marge_simpson/tasklist.md (prioritized tasks with DoD + verification)
+- marge_simpson/instructions_log.md (append any new standing instructions I give)
 
-Then immediately start executing the remaining unchecked items in <folder>/tasklist.md (P0 → P1 → P2), keeping docs updated as you go.
+Then immediately start executing the remaining unchecked items in marge_simpson/tasklist.md (P0 → P1 → P2), keeping docs updated as you go.
 Output using the Response Format (include IDs touched).
 ```
 
@@ -57,7 +58,7 @@ Natural language, super simple.
 Modify then Paste this entire prompt into your assistant chat:
 
 ```txt
-Read the AGENTS.md file in this folder and follow it.
+Read the AGENTS.md file in the marge_simpson folder and follow it.
 
 Questions / Confirmations:
 1. (Question/confirmation here)
@@ -71,7 +72,7 @@ Issues:
 - Example / New Issue: "The right hand side nav is expanding as expected, however it will not close"
 - Example / Existing issue not fixed: "MS-0046 not fixed, still exibiting [insert issue here]"
 
-After the issues above, continue remaining unchecked items (if any exist) in <folder>/tasklist.md (P0 → P1 → P2).
+After the issues above, continue remaining unchecked items (if any exist) in marge_simpson/tasklist.md (P0 → P1 → P2).
 ```
 
 **How it behaves**
@@ -90,8 +91,8 @@ After the issues above, continue remaining unchecked items (if any exist) in <fo
 - track work with a single incrementing ID (`MS-0001`, `MS-0002`, …)
 - **automated verification** with auto-detected test stacks (Node, Python, Go, Rust, .NET, Java)
 - keep two source-of-truth docs:
-  - **`<folder>/tasklist.md`** (what's left / doing / done)
-  - **`<folder>/assessment.md`** (root cause notes + verification)
+  - **`marge_simpson/tasklist.md`** (what's left / doing / done)
+  - **`marge_simpson/assessment.md`** (root cause notes + verification)
 
 ---
 
@@ -100,7 +101,7 @@ After the issues above, continue remaining unchecked items (if any exist) in <fo
 Simply ask your agent!
 
 ```txt
-List remaining unchecked items (if any exist) in <folder>/tasklist.md
+List remaining unchecked items (if any exist) in marge_simpson/tasklist.md
 ```
 
 ---
@@ -109,7 +110,7 @@ List remaining unchecked items (if any exist) in <folder>/tasklist.md
 After you direct and test a bunch of fixes, reply once (instead of 10 times and losing fidelity):
 
 ```txt
-Read the AGENTS.md file in this folder and follow it.
+Read the AGENTS.md file in the marge_simpson folder and follow it.
 
 Questions / Confirmations:
 1. (Question/confirmation here)
@@ -123,14 +124,14 @@ Issues:
 - Example / New Issue: "The right hand side nav is expanding as expected, however it will not close"
 - Example / Existing issue not fixed: "MS-0046 not fixed, still exibiting [insert issue here]"
 
-After the issues above, continue remaining unchecked items (if any exist) in <folder>/tasklist.md (P0 → P1 → P2).
+After the issues above, continue remaining unchecked items (if any exist) in marge_simpson/tasklist.md (P0 → P1 → P2).
 ```
 
 ---
 
 ## What’s inside
 ```
-<folder>/
+marge_simpson/
   AGENTS.md               # The rules assistants follow
   assessment.md           # Findings + root cause + verification
   tasklist.md             # Prioritized tasks with DoD

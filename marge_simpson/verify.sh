@@ -7,9 +7,9 @@ set -euo pipefail
 # This script auto-detects its own folder name, so you can rename the folder if needed.
 #
 # Usage:
-#   ./<folder>/verify.sh fast
-#   ./<folder>/verify.sh full
-#   ./<folder>/verify.sh fast --skip-if-no-tests
+#   ./marge_simpson/verify.sh fast
+#   ./marge_simpson/verify.sh full
+#   ./marge_simpson/verify.sh fast --skip-if-no-tests
 #
 # Options:
 #   fast|full (default: fast)
@@ -49,7 +49,7 @@ run_cmd() {
   say ""
   say "==> $cmd"
   # shellcheck disable=SC2086
-  (cd "$ROOT_DIR" && bash -lc "$cmd") 2>&1 | tee -a "$LOG_FILE"
+  (cd "$ROOT_DIR" && bash -c "$cmd") 2>&1 | tee -a "$LOG_FILE"
 }
 
 read_config_commands() {

@@ -1,3 +1,6 @@
+# Meta-development folder (not for distribution)
+marge_for_marge1/
+
 # OS / filesystem noise
 .DS_Store
 Thumbs.db
