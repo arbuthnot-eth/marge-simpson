@@ -34,4 +34,25 @@ if (Test-Path $dst) {
 }
 
 Copy-Item -Recurse -Force $src $dst
-Write-Host "Installed: $dst"
+
+# Validate installation
+$requiredFiles = @("AGENTS.md", "verify.ps1", "verify.sh", "verify.config.json", "README.md")
+$missingFiles = @()
+
+foreach ($file in $requiredFiles) {
+  $filePath = Join-Path $dst $file
+  if (-not (Test-Path $filePath)) {
+    $missingFiles += $file
+  }
+}
+
+if ($missingFiles.Count -gt 0) {
+  Write-Host "WARNING: Installation may be incomplete. Missing files:" -ForegroundColor Yellow
+  foreach ($f in $missingFiles) {
+    Write-Host "  - $f" -ForegroundColor Yellow
+  }
+  exit 1
+}
+
+Write-Host "Installed: $dst" -ForegroundColor Green
+Write-Host "Validated: $($requiredFiles.Count) required files present" -ForegroundColor Green

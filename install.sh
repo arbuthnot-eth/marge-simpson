@@ -46,4 +46,24 @@ fi
 
 mkdir -p "$TARGET"
 cp -R "$SRC" "$DEST"
+
+# Validate installation
+REQUIRED_FILES=("AGENTS.md" "verify.ps1" "verify.sh" "verify.config.json" "README.md")
+MISSING_FILES=()
+
+for file in "${REQUIRED_FILES[@]}"; do
+  if [[ ! -f "$DEST/$file" ]]; then
+    MISSING_FILES+=("$file")
+  fi
+done
+
+if [[ ${#MISSING_FILES[@]} -gt 0 ]]; then
+  echo "WARNING: Installation may be incomplete. Missing files:" >&2
+  for f in "${MISSING_FILES[@]}"; do
+    echo "  - $f" >&2
+  done
+  exit 1
+fi
+
 echo "Installed: $DEST"
+echo "Validated: ${#REQUIRED_FILES[@]} required files present"
