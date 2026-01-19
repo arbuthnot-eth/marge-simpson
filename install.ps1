@@ -21,7 +21,13 @@ if (-not (Test-Path $src)) {
   exit 1
 }
 
-$dst = Join-Path (Resolve-Path $Target) "marge_simpson"
+$resolvedTarget = Resolve-Path $Target -ErrorAction SilentlyContinue
+if (-not $resolvedTarget) {
+  New-Item -ItemType Directory -Path $Target -Force | Out-Null
+  $resolvedTarget = Resolve-Path $Target
+}
+
+$dst = Join-Path $resolvedTarget "marge_simpson"
 
 if (Test-Path $dst) {
   if (-not $Force) {

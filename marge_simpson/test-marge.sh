@@ -74,8 +74,10 @@ echo ""
 
 # Test 4: verify.sh with --skip-if-no-tests
 echo "[4/6] verify.sh --skip-if-no-tests behavior..."
-VERIFY_OUTPUT=$("$SCRIPT_DIR/verify.sh" fast --skip-if-no-tests 2>&1) || true
+set +e
+VERIFY_OUTPUT=$("$SCRIPT_DIR/verify.sh" fast --skip-if-no-tests 2>&1)
 VERIFY_EXIT=$?
+set -e
 test_assert "verify.sh --skip-if-no-tests exits 0" "$VERIFY_EXIT" || true
 CONTAINS_FOLDER=$(echo "$VERIFY_OUTPUT" | grep -q "\[$MS_FOLDER_NAME\]" && echo 0 || echo 1)
 test_assert "Output contains folder name" "$CONTAINS_FOLDER" || true

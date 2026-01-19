@@ -125,6 +125,10 @@ while IFS= read -r -d '' file; do
   
   original_content=$(cat "$file" 2>/dev/null) || continue
   content="$original_content"
+
+  # Replace Windows-style backslash paths
+  content=${content//".\\$SOURCE_NAME\\"/".\\$TARGET_NAME\\"}
+  content=${content//"$SOURCE_NAME\\"/"$TARGET_NAME\\"}
   
   # Apply replacements using sed
   # We use a temp variable approach to avoid issues with special characters
@@ -143,8 +147,8 @@ while IFS= read -r -d '' file; do
   content=$(echo "$content" | sed "s|# $SOURCE_NAME|# $TARGET_NAME|g")
   content=$(echo "$content" | sed "s|=$SOURCE_NAME|=$TARGET_NAME|g")
   
-  # Final word-boundary replacement for any remaining instances
-  content=$(echo "$content" | sed "s/\\b$SOURCE_NAME\\b/$TARGET_NAME/g")
+  # Final word-boundary replacement for any remaining instances (portable sed)
+  content=$(echo "$content" | sed -E "s/(^|[^[:alnum:]_])$SOURCE_NAME([^[:alnum:]_]|$)/\\1$TARGET_NAME\\2/g")
   
   if [[ "$content" != "$original_content" ]]; then
     echo "$content" > "$file"
