@@ -1,8 +1,8 @@
 Read the AGENTS.md file in the marge_simpson folder and follow it.
 
-Issues:
-- (Issue here)
-- (Issue here)
+New Feature / Issues:
+- (New Feature or Issue here)
+- Example Feature: "Lets add a drop down next to search that allows for.."
 - Example / New Issue: "The right hand side nav is not expanding as expected"
 - Example / Existing issue not fixed: "MS-0046 is still exibiting [insert issue here]"
 
