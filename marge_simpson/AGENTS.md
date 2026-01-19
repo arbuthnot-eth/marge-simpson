@@ -42,13 +42,13 @@ Before architecture changes, large refactors, schema changes, or API contract ch
 **Rules:**
 - Input ≈ (context chars / 4) — attachments + file contents + conversation
 - Output ≈ (your response chars / 4)
-- Cost = (input/1M × $1) + (output/1M × $5) for Claude Opus 4.5
-- Cost = (input/1M × $3) + (output/1M × $15) for Claude Sonnet 4.5
-- Cost = (input/1M × $5) + (output/1M × $25) for Claude Opus 4.5
-- Cost = (input/1M × $1.25) + (output/1M × $10.00) for GPT-5.1-Codex
-- Cost = (input/1M × $1.25) + (output/1M × $10.00) for GPT-5.1-Codex-max
-- Cost = (input/1M × $1.75) + (output/1M × $14.00) for GPT-5.2
-- Cost = (input/1M × $1.75) + (output/1M × $14.00) for GPT-5.2-Codex
+- Model: Claude Opus 4.5 — Cost = (input/1M × $5) + (output/1M × $25)
+- Model: Claude Sonnet 4.5 — Cost = (input/1M × $3) + (output/1M × $15)
+- Model: GPT-5.2 — Cost = (input/1M × $1.75) + (output/1M × $14.00)
+- Model: GPT-5.2-chat-latest — Cost = (input/1M × $1.75) + (output/1M × $14.00)
+- Model: GPT-5.2-Codex — Cost = (input/1M × $1.75) + (output/1M × $14.00)
+- Model: GPT-5.1-Codex-max — Cost = (input/1M × $1.25) + (output/1M × $10.00)
+- Model: GPT-5.1-Codex — Cost = (input/1M × $1.25) + (output/1M × $10.00)
 - Round tokens to nearest 100, cost to 4 decimals
 - **Never skip this. No exceptions.**
 
@@ -119,13 +119,13 @@ If message has multiple intents:
 When delivering work:
 
 ```
-+========================================================+
-|    __  __    _    ____   ____ _____                    |
-|   |  \/  |  / \  |  _ \ / ___| ____|                   |
-|   | |\/| | / _ \ | |_) | |  _|  _|                     |
-|   | |  | |/ ___ \|  _ <| |_| | |___                    |
-|   |_|  |_/_/   \_\_| \_\\____|_____|   WORK COMPLETE   |
-+========================================================+
++=======================================================+
+|    __  __    _    ____   ____ _____                   |
+|   |  \/  |  / \  |  _ \ / ___| ____|                  |
+|   | |\/| | / _ \ | |_) | |  _|  _|                    |
+|   | |  | |/ ___ \|  _ <| |_| | |___                   |
+|   |_|  |_/_/   \_\_| \_\\____|_____|   WORK COMPLETE  |
++=======================================================+
 ```
 
 | Field | Value |
@@ -152,7 +152,6 @@ When delivering work:
 3. If experts/knowledge are needed, read their `_index.md` first, then only the targeted small files.
 4. Track work only in the folder whose AGENTS you read.
 5. Keep changes minimal; avoid extra file reads unless blocked.
-6. If unsure, stop and ask rather than reading more files.
 
 ### Workflows
 Read only when needed:
