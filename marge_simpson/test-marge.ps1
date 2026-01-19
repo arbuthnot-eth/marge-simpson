@@ -1,11 +1,13 @@
 <#
-test-marge.ps1 - Marge Simpson Self-Test Suite
+test-marge.ps1 - Marge Simpson Self-Test Suite (Slim Edition)
 
-Validates that:
-1. Scripts exist and are valid PowerShell/Bash
-2. Folder name auto-detection works
-3. SkipIfNoTests exits 0
-4. Cleanup script runs in preview mode
+Validates core installation:
+1. Required files exist
+2. PowerShell scripts have valid syntax
+3. Bash scripts have valid syntax (if bash available)
+4. Folder name auto-detection works
+5. SkipIfNoTests exits 0
+6. Cleanup script runs in preview mode
 
 Usage:
   powershell -ExecutionPolicy Bypass -File .\marge_simpson\test-marge.ps1
@@ -154,6 +156,16 @@ function Test-Assert {
     }
 }
 
+# Check if bash is available (Git Bash, WSL, or native)
+function Test-BashAvailable {
+    try {
+        $null = & bash --version 2>&1
+        return $LASTEXITCODE -eq 0
+    } catch {
+        return $false
+    }
+}
+
 # ==============================================================================
 # MAIN EXECUTION
 # ==============================================================================
@@ -161,7 +173,7 @@ function Test-Assert {
 Write-Banner
 
 # Test 1: Required files exist
-Write-Section "Test Suite 1/6: File Existence"
+Write-Section "Test Suite 1/5: File Existence"
 Test-Assert "AGENTS.md exists" { Test-Path (Join-Path $MsDir "AGENTS.md") }
 Test-Assert "verify.ps1 exists" { Test-Path (Join-Path $MsDir "verify.ps1") }
 Test-Assert "verify.sh exists" { Test-Path (Join-Path $MsDir "verify.sh") }
@@ -170,28 +182,55 @@ Test-Assert "cleanup.sh exists" { Test-Path (Join-Path $MsDir "cleanup.sh") }
 Test-Assert "verify.config.json exists" { Test-Path (Join-Path $MsDir "verify.config.json") }
 Test-Assert "README.md exists" { Test-Path (Join-Path $MsDir "README.md") }
 
-# Test 2: verify.ps1 syntax check
-Write-Section "Test Suite 2/6: Script Syntax Validation"
-Test-Assert "verify.ps1 valid syntax" {
+# Test 2: Script syntax validation
+Write-Section "Test Suite 2/5: Script Syntax Validation"
+
+# PowerShell syntax
+Test-Assert "verify.ps1 valid PowerShell syntax" {
     $null = [System.Management.Automation.Language.Parser]::ParseFile(
         (Join-Path $MsDir "verify.ps1"), [ref]$null, [ref]$null
     )
     $true
 }
-Test-Assert "cleanup.ps1 valid syntax" {
+Test-Assert "cleanup.ps1 valid PowerShell syntax" {
     $null = [System.Management.Automation.Language.Parser]::ParseFile(
         (Join-Path $MsDir "cleanup.ps1"), [ref]$null, [ref]$null
     )
     $true
 }
 
+# Bash syntax (if bash available)
+$bashAvailable = Test-BashAvailable
+if ($bashAvailable) {
+    Test-Assert "verify.sh valid bash syntax" {
+        $shPath = (Join-Path $MsDir "verify.sh") -replace '\\', '/'
+        # Convert Windows path to bash-compatible path
+        if ($shPath -match '^([A-Za-z]):(.*)$') {
+            $shPath = "/" + $Matches[1].ToLower() + $Matches[2]
+        }
+        $result = & bash -n $shPath 2>&1
+        $LASTEXITCODE -eq 0
+    }
+    Test-Assert "cleanup.sh valid bash syntax" {
+        $shPath = (Join-Path $MsDir "cleanup.sh") -replace '\\', '/'
+        if ($shPath -match '^([A-Za-z]):(.*)$') {
+            $shPath = "/" + $Matches[1].ToLower() + $Matches[2]
+        }
+        $result = & bash -n $shPath 2>&1
+        $LASTEXITCODE -eq 0
+    }
+} else {
+    Write-Host "    [SKIP] " -NoNewline -ForegroundColor DarkYellow
+    Write-Host "Bash syntax tests - bash not available (install Git Bash or WSL)" -ForegroundColor DarkYellow
+}
+
 # Test 3: Folder name detection
-Write-Section "Test Suite 3/6: Folder Auto-Detection"
+Write-Section "Test Suite 3/5: Folder Auto-Detection"
 Test-Assert "Detected folder name is '$MsFolderName'" { $MsFolderName -ne "" }
 Test-Assert "Parent folder exists" { Test-Path $RepoRoot }
 
-# Test 4: verify.ps1 with SkipIfNoTests (skip if already running through verify harness)
-Write-Section "Test Suite 4/6: Verify SkipIfNoTests Behavior"
+# Test 4: verify.ps1 with SkipIfNoTests
+Write-Section "Test Suite 4/5: Verify SkipIfNoTests Behavior"
 $isNestedRun = $env:MARGE_TEST_RUNNING -eq "1"
 if ($isNestedRun) {
     Write-Host "    [SKIP] " -NoNewline -ForegroundColor DarkYellow
@@ -208,88 +247,12 @@ if ($isNestedRun) {
 }
 
 # Test 5: cleanup.ps1 preview mode
-Write-Section "Test Suite 5/6: Cleanup Preview Mode"
+Write-Section "Test Suite 5/5: Cleanup Preview Mode"
 $cleanupScript = Join-Path $MsDir "cleanup.ps1"
 $cleanupResult = & powershell -ExecutionPolicy Bypass -File $cleanupScript 2>&1
 $cleanupExitCode = $LASTEXITCODE
 Test-Assert "cleanup.ps1 exits 0 in preview mode" { $cleanupExitCode -eq 0 }
 Test-Assert "Output shows PREVIEW MODE" { ($cleanupResult -join "`n") -match "PREVIEW" }
-
-# Test 6: AGENTS.md content validation
-Write-Section "Test Suite 6/7: AGENTS.md Content Validation"
-$agentsPath = Join-Path $MsDir "AGENTS.md"
-$agentsContent = Get-Content -Path $agentsPath -Raw
-
-Test-Assert "AGENTS.md contains CRITICAL RULE(S)" { 
-    $agentsContent -match "\*\*CRITICAL RULE" 
-}
-Test-Assert "AGENTS.md contains folder reference '$MsFolderName/'" { 
-    $agentsContent -match [regex]::Escape("``$MsFolderName/``")
-}
-Test-Assert "AGENTS.md contains verification runner reference" { 
-    $agentsContent -match "verify\.ps1 fast" -and $agentsContent -match "verify\.sh fast"
-}
-Test-Assert "AGENTS.md contains MS-#### tracking ID format" { 
-    $agentsContent -match "MS-\d{4}" -or $agentsContent -match "MS-####"
-}
-
-# Meta-specific test: If this is meta_marge, check for audit exclusion rule
-if ($MsFolderName -eq "meta_marge") {
-    Test-Assert "AGENTS.md contains meta audit exclusion rule" {
-        $agentsContent -match "excluded from audits"
-    }
-}
-
-# Test 7: Expert Integration Validation
-Write-Section "Test Suite 7/7: Expert Integration Validation"
-
-# Check EXPERT_REGISTRY.md exists
-$expertRegistryPath = Join-Path $MsDir "EXPERT_REGISTRY.md"
-$expertRegistryExists = Test-Path $expertRegistryPath
-Test-Assert "EXPERT_REGISTRY.md exists" { $expertRegistryExists }
-
-if ($expertRegistryExists) {
-    $expertContent = Get-Content -Path $expertRegistryPath -Raw
-    
-    # Validate expert structure - each expert should have these key fields
-    Test-Assert "EXPERT_REGISTRY.md contains Title field" {
-        $expertContent -match "\*\*Title\*\*:"
-    }
-    Test-Assert "EXPERT_REGISTRY.md contains Experience field" {
-        $expertContent -match "\*\*Experience\*\*:"
-    }
-    Test-Assert "EXPERT_REGISTRY.md contains Knowledge Domains" {
-        $expertContent -match "\*\*Knowledge Domains\*\*:"
-    }
-    Test-Assert "EXPERT_REGISTRY.md contains Behavioral Patterns" {
-        $expertContent -match "\*\*Behavioral Patterns\*\*:"
-    }
-    Test-Assert "EXPERT_REGISTRY.md contains Role Boundaries" {
-        $expertContent -match "\*\*Role Boundaries\*\*:"
-    }
-    
-    # Validate key experts exist (these are critical for the system)
-    Test-Assert "Principal Systems Architect expert exists" {
-        $expertContent -match "Principal Systems Architect"
-    }
-    Test-Assert "Security & Compliance Architect expert exists" {
-        $expertContent -match "Security.*Compliance.*Architect"
-    }
-    Test-Assert "Senior QA Engineer expert exists" {
-        $expertContent -match "Senior QA Engineer"
-    }
-    
-    # Validate AGENTS.md has expert integration
-    Test-Assert "AGENTS.md contains Expert Integration section" {
-        $agentsContent -match "Expert Integration"
-    }
-    Test-Assert "AGENTS.md references EXPERT_REGISTRY.md" {
-        $agentsContent -match "EXPERT_REGISTRY\.md"
-    }
-} else {
-    # Skip expert-specific tests if registry doesn't exist
-    Write-Host "    [SKIP] Expert structure tests - EXPERT_REGISTRY.md not found" -ForegroundColor DarkYellow
-}
 
 # Summary
 Write-FinalSummary

@@ -332,28 +332,124 @@ If intent is unclear:
 
 ---
 
-## I) Expert Integration (Optional)
+## I) Expert Integration (Token-Efficient)
 
-If `marge_simpson/EXPERT_REGISTRY.md` exists in the workspace, use it to enhance work quality.
+Use the chunked expert system in `marge_simpson/experts/` to enhance work quality without reading all experts.
+
+### Index-First Lookup (REQUIRED)
+
+**DO NOT read all expert files.** Follow this process:
+
+1) Read `marge_simpson/experts/_index.md` (~400 tokens)
+2) Identify keywords from the task/feature
+3) Find the matching file(s) in the index table
+4) Read ONLY the relevant expert file(s) (~800-2000 tokens each)
 
 ### When to Use Experts
 
 - **Feature requests**: Select expert(s) whose domain matches the feature
 - **Complex issues**: Select expert(s) who specialize in the affected area
-- **Architecture decisions**: Consult Principal Systems Architect persona
-- **Security concerns**: Consult Security & Compliance Architect persona
+- **Architecture decisions**: Read `experts/architecture.md`
+- **Security concerns**: Read `experts/security.md`
+- **Testing strategy**: Read `experts/testing.md`
 
 ### Expert Selection Process
 
-1) Read the feature/issue description.
-2) Match against Knowledge Domains in EXPERT_REGISTRY.md.
-3) Select 1-3 most relevant experts.
-4) Record in assessment.md under `Expert(s):` field.
-5) Apply that persona's Behavioral Patterns when making decisions.
+1) Read `experts/_index.md` first.
+2) Match task keywords against the index table.
+3) Read only the mapped file(s).
+4) Select 1-3 most relevant experts from those files.
+5) Record in assessment.md under `Expert(s):` field.
+6) Apply that persona's Behavioral Patterns when making decisions.
 
 ### Expert Field Format
 
 ```
 Expert(s): Principal Systems Architect, Security & Compliance Architect
 ```
+
+### Cost Awareness
+
+| Approach | Tokens |
+|----------|--------|
+| Old (monolithic EXPERT_REGISTRY.md) | ~10,000 |
+| New (index + 1 file) | ~1,200 |
+| New (index + 2 files) | ~2,000 |
+
+---
+
+## J) Knowledge Base (Token-Efficient Persistent Memory)
+
+Use the chunked knowledge system in `marge_simpson/knowledge/` to persist and retrieve project knowledge without reading everything.
+
+### Index-First Lookup (REQUIRED)
+
+**DO NOT read all knowledge files.** Follow this process:
+
+1) Read `marge_simpson/knowledge/_index.md` (~500 tokens)
+2) Check Quick Stats for entry counts
+3) Search Tag Index for relevant tags
+4) Read ONLY the relevant knowledge file(s)
+
+### Knowledge Files
+
+| File | Entry Prefix | Purpose |
+|------|--------------|---------|
+| `decisions.md` | D-### | Strategic choices with rationale |
+| `patterns.md` | P-### | Recurring behaviors / approaches |
+| `preferences.md` | PR-### | User's stated preferences |
+| `insights.md` | I-### | AI-inferred observations |
+
+### When to Write Knowledge
+
+**Record a Decision (D-###) when:**
+- User makes an explicit architectural choice
+- A significant tradeoff is discussed and resolved
+- Technology/approach is selected over alternatives
+
+**Record a Pattern (P-###) when:**
+- Same solution is used 2+ times
+- User establishes a coding convention
+- A reusable approach emerges
+
+**Record a Preference (PR-###) when:**
+- User explicitly states how they want something done
+- User corrects the AI's approach
+- User expresses style/format preferences
+
+**Record an Insight (I-###) when:**
+- A pattern is noticed but user hasn't stated it
+- Confidence is Medium+ based on multiple observations
+- Mark as unverified until user confirms
+
+### Writing Process
+
+1) Read `knowledge/_index.md` to get next ID for the category
+2) Add entry to the appropriate knowledge file
+3) Update `_index.md`:
+   - Increment entry count in Quick Stats
+   - Add to Recent Entries (keep last 5)
+   - Add any new tags to Tag Index
+
+### Reading Process (for context)
+
+1) Read `knowledge/_index.md` (~500 tokens)
+2) If starting a new feature/task, check Recent Entries
+3) If working in a specific area, check Tag Index for relevant tags
+4) Read only the file(s) containing matching entries
+
+### Cost Awareness
+
+| Approach | Tokens |
+|----------|--------|
+| Read everything | ~3,000+ (grows over time) |
+| Read index only | ~500 |
+| Read index + 1 file | ~1,000-1,500 |
+
+### Maintenance
+
+- Keep entries concise (5-10 lines max)
+- Archive old/obsolete entries quarterly
+- Verify insights when opportunity arises
+- Cross-reference related entries with `Related:` field
 
