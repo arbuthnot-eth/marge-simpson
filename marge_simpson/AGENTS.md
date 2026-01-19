@@ -32,6 +32,18 @@ Before architecture changes, large refactors, schema changes, or API contract ch
 ### Uncertainty Policy
 - Say what you checked, what you know, and what remains unknown.
 
+### Token Estimate (REQUIRED)
+**CRITICAL:** At the END of EVERY response, include this line:
+
+`📊 ~In: X,XXX | Out: X,XXX | Est: $X.XXXX`
+
+**Rules:**
+- Input ≈ (context chars / 4) — attachments + file contents + conversation
+- Output ≈ (your response chars / 4)
+- Cost = (input/1M × $5) + (output/1M × $25) for Opus 4.5
+- Round tokens to nearest 100, cost to 4 decimals
+- **Never skip this. No exceptions.**
+
 ---
 
 ## B) Tracking System
