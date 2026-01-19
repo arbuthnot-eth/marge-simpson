@@ -30,7 +30,12 @@ When you're done improving Marge via meta_marge:
 ```
 
 ```bash
-# macOS/Linux (coming soon — use manual method for now)
+# macOS/Linux
+./convert-to-meta.sh
+
+# Or with options
+./convert-to-meta.sh -f                    # Force overwrite
+./convert-to-meta.sh -s marge_simpson -t my_meta_marge
 ```
 
 The script:

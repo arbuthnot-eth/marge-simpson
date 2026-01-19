@@ -133,6 +133,13 @@ $allFiles = Get-ChildItem -Path $targetFolder -Recurse -File
 $transformedCount = 0
 $skippedCount = 0
 
+# Files that document the dual-folder scenario and should NOT have marge_simpson replaced
+# These files intentionally contain both folder names to explain how the system works
+$dualFolderDocFiles = @(
+    "workflows\_index.md",
+    "workflows/_index.md"
+)
+
 foreach ($file in $allFiles) {
     $ext = $file.Extension.ToLower()
     $name = $file.Name
@@ -142,6 +149,14 @@ foreach ($file in $allFiles) {
     
     # Skip binary files and verify_logs
     if ($file.FullName -like "*\verify_logs\*") {
+        continue
+    }
+    
+    # Skip dual-folder documentation files (they intentionally contain both folder names)
+    $relPath = $file.FullName.Substring($targetFolder.Length + 1)
+    $isDualFolderDoc = $dualFolderDocFiles | Where-Object { $relPath -like "*$_" }
+    if ($isDualFolderDoc) {
+        Write-Host "  Skipped (dual-folder doc): $relPath" -ForegroundColor DarkYellow
         continue
     }
     
@@ -168,14 +183,23 @@ foreach ($file in $allFiles) {
         # BUT: Exclude patterns where both folder names appear together (documentation explaining the dual-folder setup)
         # First, protect contextual references by temporarily replacing them
         $contextualPatterns = @(
+            # Dual-folder documentation patterns (workflows/_index.md and similar)
             @{ Pattern = "both ``$SourceName/`` and ``$TargetName/``"; Placeholder = "###BOTH_FOLDERS_BACKTICK###" },
             @{ Pattern = "both ``$TargetName/`` and ``$SourceName/``"; Placeholder = "###BOTH_FOLDERS_BACKTICK_REV###" },
             @{ Pattern = "``$SourceName/`` and ``$TargetName/``"; Placeholder = "###AND_FOLDERS_BACKTICK###" },
             @{ Pattern = "``$TargetName/`` and ``$SourceName/``"; Placeholder = "###AND_FOLDERS_BACKTICK_REV###" },
-            @{ Pattern = "$SourceName/`` (source of truth)"; Placeholder = "###SOURCE_TRUTH###" },
-            @{ Pattern = "$TargetName/`` (working copy"; Placeholder = "###WORKING_COPY###" },
+            @{ Pattern = "``$SourceName/`` (source of truth)"; Placeholder = "###SOURCE_TRUTH###" },
+            @{ Pattern = "``$TargetName/`` (working copy"; Placeholder = "###WORKING_COPY###" },
             @{ Pattern = "Read ``$SourceName/AGENTS.md``"; Placeholder = "###READ_SOURCE_AGENTS###" },
-            @{ Pattern = "IDs in ``$SourceName/tasklist.md``"; Placeholder = "###IDS_SOURCE_TASKLIST###" }
+            @{ Pattern = "IDs in ``$SourceName/tasklist.md``"; Placeholder = "###IDS_SOURCE_TASKLIST###" },
+            # Additional patterns for workflows/_index.md Scope Inference section
+            @{ Pattern = "When both ``$SourceName/`` and ``$TargetName/`` exist"; Placeholder = "###WHEN_BOTH_EXIST###" },
+            @{ Pattern = "I noticed you have both ``$SourceName/`` and ``$TargetName/``"; Placeholder = "###NOTICED_BOTH###" },
+            @{ Pattern = "- ``$SourceName/`` (source of truth)"; Placeholder = "###LIST_SOURCE###" },
+            @{ Pattern = "- ``$TargetName/`` (working copy for meta-development)"; Placeholder = "###LIST_TARGET###" },
+            @{ Pattern = "Only ``$SourceName/`` exists"; Placeholder = "###ONLY_SOURCE_EXISTS###" },
+            @{ Pattern = "Read ``$SourceName/AGENTS.md`` "; Placeholder = "###READ_AGENTS_ARROW###" },
+            @{ Pattern = " ``$SourceName/tasklist.md``"; Placeholder = "###TASKLIST_SOURCE###" }
         )
         
         # Protect contextual patterns
@@ -316,22 +340,34 @@ if (Test-Path $agentsPath) {
 # Verify the conversion
 Write-Host "[5/5] Verifying conversion..." -ForegroundColor Green
 
-# Check for any remaining source name references (should be zero)
+# Check for any remaining source name references (excluding dual-folder doc files which intentionally keep both names)
 $remainingRefs = 0
+$expectedRefs = 0
 foreach ($file in (Get-ChildItem -Path $targetFolder -Recurse -File)) {
     if ($file.FullName -like "*\verify_logs\*") { continue }
+    
+    $relPath = $file.FullName.Substring($targetFolder.Length + 1)
+    $isDualFolderDoc = $dualFolderDocFiles | Where-Object { $relPath -like "*$_" }
+    
     try {
         $content = Get-Content -Path $file.FullName -Raw -ErrorAction SilentlyContinue
         if ($content -and $content -match "\b$([regex]::Escape($SourceName))\b") {
-            $relPath = $file.FullName.Substring($targetFolder.Length + 1)
-            Write-Host "  WARNING: '$SourceName' still found in: $relPath" -ForegroundColor Yellow
-            $remainingRefs++
+            if ($isDualFolderDoc) {
+                Write-Host "  OK (expected): '$SourceName' in dual-folder doc: $relPath" -ForegroundColor DarkGray
+                $expectedRefs++
+            } else {
+                Write-Host "  WARNING: '$SourceName' still found in: $relPath" -ForegroundColor Yellow
+                $remainingRefs++
+            }
         }
     } catch { }
 }
 
 if ($remainingRefs -gt 0) {
-    Write-Host "  $remainingRefs file(s) still contain '$SourceName' references" -ForegroundColor Yellow
+    Write-Host "  $remainingRefs file(s) have unexpected '$SourceName' references" -ForegroundColor Yellow
+}
+if ($expectedRefs -gt 0) {
+    Write-Host "  $expectedRefs file(s) have expected '$SourceName' references (dual-folder docs)" -ForegroundColor DarkGray
 }
 
 # Run verification if verify script exists
