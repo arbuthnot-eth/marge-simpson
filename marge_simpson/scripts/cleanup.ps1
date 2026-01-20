@@ -26,8 +26,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Dynamic folder detection - works regardless of folder name
-$margeDir = $PSScriptRoot
+# Dynamic folder detection (scripts are now in scripts/ subfolder)
+$scriptsDir = $PSScriptRoot
+$margeDir = (Get-Item $scriptsDir).Parent.FullName
 $msFolderName = Split-Path $margeDir -Leaf
 $repoRoot = (Get-Item $margeDir).Parent.FullName
 $previewMode = -not $Confirm

@@ -32,7 +32,7 @@ User wants something **done** - any of:
    ### [MS-####] Short description
    - **Type:** bug | feature | improvement
    - **DoD:** What "done" looks like
-   - **Verification:** `./marge_simpson/verify.ps1 fast`
+   - **Verification:** `./marge_simpson/scripts/verify.ps1 fast`
    - **Status:** [ ] Not started
    ```
 4. Increment `Next ID` in BOTH files
@@ -63,7 +63,7 @@ User wants something **done** - any of:
                ▼
 ┌─────────────────────────────────────┐
 │  2. VERIFY                          │
-│     - Run: ./marge_simpson/verify.ps1 fast │
+│     - Run: ./marge_simpson/scripts/verify.ps1 fast │
 │     - Run any item-specific tests   │
 │     - Capture raw output            │
 └──────────────┬──────────────────────┘

@@ -7,9 +7,9 @@ set -euo pipefail
 # This script auto-detects its own folder name, so you can rename the folder if needed.
 #
 # Usage:
-#   ./marge_simpson/verify.sh fast
-#   ./marge_simpson/verify.sh full
-#   ./marge_simpson/verify.sh fast --skip-if-no-tests
+#   ./marge_simpson/scripts/verify.sh fast
+#   ./marge_simpson/scripts/verify.sh full
+#   ./marge_simpson/scripts/verify.sh fast --skip-if-no-tests
 #
 # Options:
 #   fast|full (default: fast)
@@ -26,11 +26,11 @@ for arg in "$@"; do
   esac
 done
 
-# Dynamic folder detection — works regardless of folder name
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MS_FOLDER_NAME="$(basename "$SCRIPT_DIR")"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-MS_DIR="$SCRIPT_DIR"
+# Dynamic folder detection (scripts are now in scripts/ subfolder)
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MS_DIR="$(cd "$SCRIPTS_DIR/.." && pwd)"
+MS_FOLDER_NAME="$(basename "$MS_DIR")"
+ROOT_DIR="$(cd "$MS_DIR/.." && pwd)"
 CONF="$MS_DIR/verify.config.json"
 LOG_DIR="$MS_DIR/verify_logs"
 

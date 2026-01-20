@@ -78,7 +78,7 @@ For each MS-#### item:
 ```
 1. IMPLEMENT → smallest safe fix
        ↓
-2. VERIFY → run ./marge_simpson/verify.ps1 fast (or verify.sh)
+2. VERIFY → run ./marge_simpson/scripts/verify.ps1 fast (or verify.sh)
        ↓
 3. RECORD → paste evidence in assessment.md
        ↓
@@ -206,12 +206,12 @@ If `experts/` folder exists:
 ### Verification Commands
 ```bash
 # Windows
-./marge_simpson/verify.ps1 fast
-./marge_simpson/verify.ps1 fast -SkipIfNoTests
+./marge_simpson/scripts/verify.ps1 fast
+./marge_simpson/scripts/verify.ps1 fast -SkipIfNoTests
 
 # macOS/Linux  
-./marge_simpson/verify.sh fast
-./marge_simpson/verify.sh fast --skip-if-no-tests
+./marge_simpson/scripts/verify.sh fast
+./marge_simpson/scripts/verify.sh fast --skip-if-no-tests
 ```
 
 ### Work Order

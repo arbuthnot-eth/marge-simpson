@@ -13,15 +13,15 @@ set -euo pipefail
 # 4. instructions_log.md - Never modify (standing instructions are permanent)
 #
 # Usage:
-#   ./cleanup.sh                    # Preview mode (safe)
-#   ./cleanup.sh --confirm          # Actually perform cleanup
-#   ./cleanup.sh --keep-logs 20     # Keep more logs
+#   ./marge_simpson/scripts/cleanup.sh                    # Preview mode (safe)
+#   ./marge_simpson/scripts/cleanup.sh --confirm          # Actually perform cleanup
+#   ./marge_simpson/scripts/cleanup.sh --keep-logs 20     # Keep more logs
 
-# Dynamic folder detection — works regardless of folder name
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MS_FOLDER_NAME="$(basename "$SCRIPT_DIR")"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-MARGE_DIR="$SCRIPT_DIR"
+# Dynamic folder detection (scripts are now in scripts/ subfolder)
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MARGE_DIR="$(cd "$SCRIPTS_DIR/.." && pwd)"
+MS_FOLDER_NAME="$(basename "$MARGE_DIR")"
+REPO_ROOT="$(cd "$MARGE_DIR/.." && pwd)"
 
 # Defaults
 KEEP_LOGS=10

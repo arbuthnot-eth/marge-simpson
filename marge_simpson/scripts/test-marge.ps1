@@ -10,7 +10,7 @@ Validates core installation:
 6. Cleanup script runs in preview mode
 
 Usage:
-  powershell -ExecutionPolicy Bypass -File .\marge_simpson\test-marge.ps1
+  powershell -ExecutionPolicy Bypass -File .\marge_simpson\scripts\test-marge.ps1
 #>
 
 $ErrorActionPreference = "Stop"
@@ -18,8 +18,9 @@ $script:TestsPassed = 0
 $script:TestsFailed = 0
 $script:StartTime = Get-Date
 
-# Dynamic folder detection
-$MsDir = $PSScriptRoot
+# Dynamic folder detection (scripts are now in scripts/ subfolder)
+$ScriptsDir = $PSScriptRoot
+$MsDir = (Get-Item $ScriptsDir).Parent.FullName
 $MsFolderName = Split-Path $MsDir -Leaf
 $RepoRoot = (Get-Item $MsDir).Parent.FullName
 
@@ -175,10 +176,10 @@ Write-Banner
 # Test 1: Required files exist
 Write-Section "Test Suite 1/5: File Existence"
 Test-Assert "AGENTS.md exists" { Test-Path (Join-Path $MsDir "AGENTS.md") }
-Test-Assert "verify.ps1 exists" { Test-Path (Join-Path $MsDir "verify.ps1") }
-Test-Assert "verify.sh exists" { Test-Path (Join-Path $MsDir "verify.sh") }
-Test-Assert "cleanup.ps1 exists" { Test-Path (Join-Path $MsDir "cleanup.ps1") }
-Test-Assert "cleanup.sh exists" { Test-Path (Join-Path $MsDir "cleanup.sh") }
+Test-Assert "verify.ps1 exists" { Test-Path (Join-Path $ScriptsDir "verify.ps1") }
+Test-Assert "verify.sh exists" { Test-Path (Join-Path $ScriptsDir "verify.sh") }
+Test-Assert "cleanup.ps1 exists" { Test-Path (Join-Path $ScriptsDir "cleanup.ps1") }
+Test-Assert "cleanup.sh exists" { Test-Path (Join-Path $ScriptsDir "cleanup.sh") }
 Test-Assert "verify.config.json exists" { Test-Path (Join-Path $MsDir "verify.config.json") }
 Test-Assert "README.md exists" { Test-Path (Join-Path $MsDir "README.md") }
 
@@ -188,13 +189,13 @@ Write-Section "Test Suite 2/5: Script Syntax Validation"
 # PowerShell syntax
 Test-Assert "verify.ps1 valid PowerShell syntax" {
     $null = [System.Management.Automation.Language.Parser]::ParseFile(
-        (Join-Path $MsDir "verify.ps1"), [ref]$null, [ref]$null
+        (Join-Path $ScriptsDir "verify.ps1"), [ref]$null, [ref]$null
     )
     $true
 }
 Test-Assert "cleanup.ps1 valid PowerShell syntax" {
     $null = [System.Management.Automation.Language.Parser]::ParseFile(
-        (Join-Path $MsDir "cleanup.ps1"), [ref]$null, [ref]$null
+        (Join-Path $ScriptsDir "cleanup.ps1"), [ref]$null, [ref]$null
     )
     $true
 }
@@ -203,7 +204,7 @@ Test-Assert "cleanup.ps1 valid PowerShell syntax" {
 $bashAvailable = Test-BashAvailable
 if ($bashAvailable) {
     Test-Assert "verify.sh valid bash syntax" {
-        $shPath = (Join-Path $MsDir "verify.sh") -replace '\\', '/'
+        $shPath = (Join-Path $ScriptsDir "verify.sh") -replace '\\', '/'
         # Convert Windows path to bash-compatible path
         if ($shPath -match '^([A-Za-z]):(.*)$') {
             $shPath = "/" + $Matches[1].ToLower() + $Matches[2]
@@ -212,7 +213,7 @@ if ($bashAvailable) {
         $LASTEXITCODE -eq 0
     }
     Test-Assert "cleanup.sh valid bash syntax" {
-        $shPath = (Join-Path $MsDir "cleanup.sh") -replace '\\', '/'
+        $shPath = (Join-Path $ScriptsDir "cleanup.sh") -replace '\\', '/'
         if ($shPath -match '^([A-Za-z]):(.*)$') {
             $shPath = "/" + $Matches[1].ToLower() + $Matches[2]
         }
@@ -231,7 +232,7 @@ if ($bashAvailable) {
     
     if ($shellcheckAvailable) {
         Test-Assert "verify.sh passes shellcheck" {
-            $shPath = (Join-Path $MsDir "verify.sh") -replace '\\', '/'
+            $shPath = (Join-Path $ScriptsDir "verify.sh") -replace '\\', '/'
             if ($shPath -match '^([A-Za-z]):(.*)$') {
                 $shPath = "/" + $Matches[1].ToLower() + $Matches[2]
             }
@@ -239,7 +240,7 @@ if ($bashAvailable) {
             $LASTEXITCODE -eq 0
         }
         Test-Assert "cleanup.sh passes shellcheck" {
-            $shPath = (Join-Path $MsDir "cleanup.sh") -replace '\\', '/'
+            $shPath = (Join-Path $ScriptsDir "cleanup.sh") -replace '\\', '/'
             if ($shPath -match '^([A-Za-z]):(.*)$') {
                 $shPath = "/" + $Matches[1].ToLower() + $Matches[2]
             }
@@ -269,7 +270,7 @@ if ($isNestedRun) {
     $script:TestsPassed += 2
 } else {
     $env:MARGE_TEST_RUNNING = "1"
-    $verifyScript = Join-Path $MsDir "verify.ps1"
+    $verifyScript = Join-Path $ScriptsDir "verify.ps1"
     $verifyResult = & powershell -ExecutionPolicy Bypass -File $verifyScript fast -SkipIfNoTests 2>&1
     $verifyExitCode = $LASTEXITCODE
     $env:MARGE_TEST_RUNNING = ""
@@ -279,7 +280,7 @@ if ($isNestedRun) {
 
 # Test 5: cleanup.ps1 preview mode
 Write-Section "Test Suite 5/5: Cleanup Preview Mode"
-$cleanupScript = Join-Path $MsDir "cleanup.ps1"
+$cleanupScript = Join-Path $ScriptsDir "cleanup.ps1"
 $cleanupResult = & powershell -ExecutionPolicy Bypass -File $cleanupScript 2>&1
 $cleanupExitCode = $LASTEXITCODE
 Test-Assert "cleanup.ps1 exits 0 in preview mode" { $cleanupExitCode -eq 0 }

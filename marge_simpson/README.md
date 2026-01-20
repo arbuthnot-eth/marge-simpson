@@ -112,7 +112,7 @@ After finished above, search for and complete remaining unchecked items (if any 
 | `assessment.md` | Findings + root cause + verification evidence |
 | `tasklist.md` | Prioritized tasks (backlog → in-progress → done) |
 | `instructions_log.md` | Your standing instructions (preserved across sessions) |
-| `verify.ps1` / `verify.sh` | Automated test runner |
+| `scripts/` | All executable scripts (verify, test, cleanup, status, decay) |
 | `verify.config.json` | Custom test commands (optional) |
 | `prompt_examples/` | Ready-to-copy prompt templates |
 
@@ -132,7 +132,7 @@ If empty, the scripts auto-detect your stack.
 
 For repos with no tests yet:
 ```bash
-./marge_simpson/verify.sh fast --skip-if-no-tests
+./marge_simpson/scripts/verify.sh fast --skip-if-no-tests
 ```
 
 ---
