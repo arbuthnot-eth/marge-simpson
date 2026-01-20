@@ -326,14 +326,25 @@ if (Test-Path $verifyLogsPath) {
     Write-Host "  Cleared: verify_logs/" -ForegroundColor Gray
 }
 
-# Verify AGENTS.md has the audit exclusion rule (should already be there from source)
+# Transform AGENTS.md for meta_marge (add audit exclusion rule)
 $agentsPath = Join-Path $targetFolder "AGENTS.md"
 if (Test-Path $agentsPath) {
     $agentsContent = Get-Content -Path $agentsPath -Raw
-    if ($agentsContent -match "excluded from audits and issue scans") {
-        Write-Host "  AGENTS.md has audit exclusion rule" -ForegroundColor Gray
+    
+    # The source marge_simpson has only 1 CRITICAL RULE. For meta_marge, we need 2 rules:
+    # 1. Audit exclusion (meta_marge is the tooling, not the target)
+    # 2. Files stay within the folder
+    $singleRulePattern = "**CRITICAL RULES:** (REQUIRED)`n1. Marge NEVER creates $TargetName related files outside its own folder. All tracking docs, logs, and artifacts stay within ``$TargetName/``."
+    $twoRulesReplacement = "**CRITICAL RULES:** (REQUIRED)`n1. The ``$TargetName/`` folder itself is excluded from audits and issue scans - it is the tooling, not the target.`n2. Marge NEVER creates $TargetName related files outside its own folder. All tracking docs, logs, and artifacts stay within ``$TargetName/``."
+    
+    if ($agentsContent.Contains($singleRulePattern)) {
+        $agentsContent = $agentsContent.Replace($singleRulePattern, $twoRulesReplacement)
+        Set-Content -Path $agentsPath -Value $agentsContent -NoNewline
+        Write-Host "  Updated: AGENTS.md (added audit exclusion rule for meta_marge)" -ForegroundColor Gray
+    } elseif ($agentsContent -match "excluded from audits and issue scans") {
+        Write-Host "  AGENTS.md already has audit exclusion rule" -ForegroundColor Gray
     } else {
-        Write-Host "  WARNING: AGENTS.md missing audit exclusion rule - check source marge_simpson/AGENTS.md" -ForegroundColor Yellow
+        Write-Host "  WARNING: AGENTS.md has unexpected format - check manually" -ForegroundColor Yellow
     }
 }
 

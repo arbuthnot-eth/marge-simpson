@@ -4,9 +4,8 @@ This folder is a drop-in workflow for running audits and fixing bugs in any code
 
 **Priority order:** correctness > safety > minimal diffs > speed
 
-**CRITICAL RULES:**
-1. Marge NEVER creates files outside its own folder. All tracking docs, logs, and artifacts stay within `marge_simpson/`.
-2. The `marge_simpson/` folder itself is excluded from audits and issue scans - it is the tooling, not the target.
+**CRITICAL RULES:** (REQUIRED)
+1. Marge NEVER creates marge_simpson related files outside its own folder. All tracking docs, logs, and artifacts stay within `marge_simpson/`.
 
 ---
 
