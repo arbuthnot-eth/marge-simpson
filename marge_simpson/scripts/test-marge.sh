@@ -50,20 +50,20 @@ echo ""
 
 # Test 1: Required files exist
 echo "[1/6] File existence checks..."
-test_assert "AGENTS.md exists" "$([[ -f "$SCRIPT_DIR/AGENTS.md" ]] && echo 0 || echo 1)" || true
-test_assert "verify.ps1 exists" "$([[ -f "$SCRIPT_DIR/verify.ps1" ]] && echo 0 || echo 1)" || true
-test_assert "verify.sh exists" "$([[ -f "$SCRIPT_DIR/verify.sh" ]] && echo 0 || echo 1)" || true
-test_assert "cleanup.ps1 exists" "$([[ -f "$SCRIPT_DIR/cleanup.ps1" ]] && echo 0 || echo 1)" || true
-test_assert "cleanup.sh exists" "$([[ -f "$SCRIPT_DIR/cleanup.sh" ]] && echo 0 || echo 1)" || true
-test_assert "verify.config.json exists" "$([[ -f "$SCRIPT_DIR/verify.config.json" ]] && echo 0 || echo 1)" || true
-test_assert "README.md exists" "$([[ -f "$SCRIPT_DIR/README.md" ]] && echo 0 || echo 1)" || true
+test_assert "AGENTS.md exists" "$([[ -f "$MS_DIR/AGENTS.md" ]] && echo 0 || echo 1)" || true
+test_assert "verify.ps1 exists" "$([[ -f "$SCRIPTS_DIR/verify.ps1" ]] && echo 0 || echo 1)" || true
+test_assert "verify.sh exists" "$([[ -f "$SCRIPTS_DIR/verify.sh" ]] && echo 0 || echo 1)" || true
+test_assert "cleanup.ps1 exists" "$([[ -f "$SCRIPTS_DIR/cleanup.ps1" ]] && echo 0 || echo 1)" || true
+test_assert "cleanup.sh exists" "$([[ -f "$SCRIPTS_DIR/cleanup.sh" ]] && echo 0 || echo 1)" || true
+test_assert "verify.config.json exists" "$([[ -f "$MS_DIR/verify.config.json" ]] && echo 0 || echo 1)" || true
+test_assert "README.md exists" "$([[ -f "$MS_DIR/README.md" ]] && echo 0 || echo 1)" || true
 echo ""
 
 # Test 2: Script syntax validation
 echo "[2/6] Script syntax validation..."
-VERIFY_SYNTAX=$(bash -n "$SCRIPT_DIR/verify.sh" 2>&1 && echo 0 || echo 1)
+VERIFY_SYNTAX=$(bash -n "$SCRIPTS_DIR/verify.sh" 2>&1 && echo 0 || echo 1)
 test_assert "verify.sh valid syntax" "$VERIFY_SYNTAX" || true
-CLEANUP_SYNTAX=$(bash -n "$SCRIPT_DIR/cleanup.sh" 2>&1 && echo 0 || echo 1)
+CLEANUP_SYNTAX=$(bash -n "$SCRIPTS_DIR/cleanup.sh" 2>&1 && echo 0 || echo 1)
 test_assert "cleanup.sh valid syntax" "$CLEANUP_SYNTAX" || true
 echo ""
 
@@ -76,7 +76,7 @@ echo ""
 # Test 4: verify.sh with --skip-if-no-tests
 echo "[4/6] verify.sh --skip-if-no-tests behavior..."
 set +e
-VERIFY_OUTPUT=$("$SCRIPT_DIR/verify.sh" fast --skip-if-no-tests 2>&1)
+VERIFY_OUTPUT=$("$SCRIPTS_DIR/verify.sh" fast --skip-if-no-tests 2>&1)
 VERIFY_EXIT=$?
 set -e
 test_assert "verify.sh --skip-if-no-tests exits 0" "$VERIFY_EXIT" || true
@@ -86,7 +86,7 @@ echo ""
 
 # Test 5: cleanup.sh preview mode
 echo "[5/6] cleanup.sh preview mode..."
-CLEANUP_OUTPUT=$("$SCRIPT_DIR/cleanup.sh" 2>&1) || true
+CLEANUP_OUTPUT=$("$SCRIPTS_DIR/cleanup.sh" 2>&1) || true
 CLEANUP_EXIT=$?
 test_assert "cleanup.sh exits 0 in preview mode" "$CLEANUP_EXIT" || true
 CONTAINS_PREVIEW=$(echo "$CLEANUP_OUTPUT" | grep -q "PREVIEW" && echo 0 || echo 1)
@@ -95,7 +95,7 @@ echo ""
 
 # Test 6: AGENTS.md content validation
 echo "[6/6] AGENTS.md content validation..."
-AGENTS_PATH="$SCRIPT_DIR/AGENTS.md"
+AGENTS_PATH="$MS_DIR/AGENTS.md"
 AGENTS_CONTENT=$(cat "$AGENTS_PATH")
 
 HAS_CRITICAL_RULE=$(echo "$AGENTS_CONTENT" | grep -q "\*\*CRITICAL RULE" && echo 0 || echo 1)
