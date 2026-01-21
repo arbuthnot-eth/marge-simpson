@@ -1,6 +1,6 @@
-# Marge Simpson - sMITten Recursive Context
+# Marge Simpson - sMITten Recursive Context + Experts
 
-# NOW with Automated Testing 🛠️
+# Includes Automated Testing 🛠️
 
 **Full Featured - Drop-in AI workflow for automated audits, bug fixes, new feature suggestion/implementation and testing - for any codebase.**
 
