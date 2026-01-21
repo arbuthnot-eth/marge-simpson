@@ -87,7 +87,7 @@ After answering the questions above, search for and complete remaining unchecked
 
 ---
 
-### 📝 Have MARGE suggest features
+### 📝 Have MARGE Suggest Features
 *Give direct instructions without needing a feature/issue format.*
 
 ```
@@ -119,7 +119,7 @@ Minimize follow-up questions. If info is missing, make reasonable assumptions an
 
 ---
 
-### 🔀 Combined
+### 🔀 Combined Prompts (mix and match at will)
 *Mix questions and issues in one prompt for efficiency.*
 
 ```
