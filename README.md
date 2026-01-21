@@ -12,7 +12,7 @@
 
 ## Install (30 seconds)
 
-1. Copy the **`marge_simpson/`** folder into your repo root
+1. Copy just the **`marge_simpson/`** folder into your repo root
 2. Use a prompt template below
 
 > **💡 Renamed the folder?** Replace `marge_simpson` with your folder name in prompts.

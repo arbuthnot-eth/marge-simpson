@@ -12,10 +12,9 @@ A portable workflow that teaches any AI assistant to audit codebases and fix bug
 
 ## Install (30 seconds)
 
-1. Copy this folder into your repo root
+1. Copy THIS folder (marge_simpson) into your repo root
 2. Use a prompt template below
 
-> **💡 Renamed the folder?** Replace `marge_simpson` with your folder name in prompts.
 
 ---
 
