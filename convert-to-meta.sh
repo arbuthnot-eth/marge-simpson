@@ -134,12 +134,28 @@ while IFS= read -r -d '' file; do
   PLACEHOLDER4="###WORKING_COPY###"
   PLACEHOLDER5="###READ_SOURCE_AGENTS###"
   PLACEHOLDER6="###IDS_SOURCE_TASKLIST###"
+  # README.md Repository Architecture section placeholders
+  PLACEHOLDER7="###README_PROD_TEMPLATE###"
+  PLACEHOLDER8="###README_SOURCE_TRUTH###"
+  PLACEHOLDER9="###README_CREATE_FROM###"
+  PLACEHOLDER10="###README_CHANGES_FLOW###"
+  PLACEHOLDER11="###README_CONTRIB_TEMPLATE###"
+  PLACEHOLDER12="###README_COPY_BACK###"
+  PLACEHOLDER13="###README_VERSION_SOURCE###"
   
   content=${content//"both \`$SOURCE_NAME/\` and \`$TARGET_NAME/\`"/"$PLACEHOLDER1"}
   content=${content//"both \`$TARGET_NAME/\` and \`$SOURCE_NAME/\`"/"$PLACEHOLDER2"}
   content=${content//"$SOURCE_NAME/\` (source of truth)"/"$PLACEHOLDER3"}
   content=${content//"Read \`$SOURCE_NAME/AGENTS.md\`"/"$PLACEHOLDER5"}
   content=${content//"IDs in \`$SOURCE_NAME/tasklist.md\`"/"$PLACEHOLDER6"}
+  # README.md Repository Architecture section protections
+  content=${content//"| \`$SOURCE_NAME/\` | **Production template**"/"$PLACEHOLDER7"}
+  content=${content//"- \`$SOURCE_NAME/\` is the **source of truth**"/"$PLACEHOLDER8"}
+  content=${content//"create \`$TARGET_NAME/\` from \`$SOURCE_NAME/\`"/"$PLACEHOLDER9"}
+  content=${content//"Changes flow: \`$SOURCE_NAME/\`"/"$PLACEHOLDER10"}
+  content=${content//"| \`$SOURCE_NAME/\` | Template for end users"/"$PLACEHOLDER11"}
+  content=${content//"Copy changes back to \`$SOURCE_NAME/\`"/"$PLACEHOLDER12"}
+  content=${content//"\`$SOURCE_NAME/VERSION\`"/"$PLACEHOLDER13"}
 
   # Replace Windows-style backslash paths
   content=${content//".\\$SOURCE_NAME\\"/".\\$TARGET_NAME\\"}
@@ -171,6 +187,14 @@ while IFS= read -r -d '' file; do
   content=${content//"$PLACEHOLDER3"/"$SOURCE_NAME/\` (source of truth)"}
   content=${content//"$PLACEHOLDER5"/"Read \`$SOURCE_NAME/AGENTS.md\`"}
   content=${content//"$PLACEHOLDER6"/"IDs in \`$SOURCE_NAME/tasklist.md\`"}
+  # Restore README.md Repository Architecture section
+  content=${content//"$PLACEHOLDER7"/"| \`$SOURCE_NAME/\` | **Production template**"}
+  content=${content//"$PLACEHOLDER8"/"- \`$SOURCE_NAME/\` is the **source of truth**"}
+  content=${content//"$PLACEHOLDER9"/"create \`$TARGET_NAME/\` from \`$SOURCE_NAME/\`"}
+  content=${content//"$PLACEHOLDER10"/"Changes flow: \`$SOURCE_NAME/\`"}
+  content=${content//"$PLACEHOLDER11"/"| \`$SOURCE_NAME/\` | Template for end users"}
+  content=${content//"$PLACEHOLDER12"/"Copy changes back to \`$SOURCE_NAME/\`"}
+  content=${content//"$PLACEHOLDER13"/"\`$SOURCE_NAME/VERSION\`"}
   
   if [[ "$content" != "$original_content" ]]; then
     echo "$content" > "$file"

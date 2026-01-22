@@ -137,7 +137,8 @@ $skippedCount = 0
 # These files intentionally contain both folder names to explain how the system works
 $dualFolderDocFiles = @(
     "workflows\_index.md",
-    "workflows/_index.md"
+    "workflows/_index.md",
+    "README.md"
 )
 
 foreach ($file in $allFiles) {
@@ -199,7 +200,15 @@ foreach ($file in $allFiles) {
             @{ Pattern = "- ``$TargetName/`` (working copy for meta-development)"; Placeholder = "###LIST_TARGET###" },
             @{ Pattern = "Only ``$SourceName/`` exists"; Placeholder = "###ONLY_SOURCE_EXISTS###" },
             @{ Pattern = "Read ``$SourceName/AGENTS.md`` "; Placeholder = "###READ_AGENTS_ARROW###" },
-            @{ Pattern = " ``$SourceName/tasklist.md``"; Placeholder = "###TASKLIST_SOURCE###" }
+            @{ Pattern = " ``$SourceName/tasklist.md``"; Placeholder = "###TASKLIST_SOURCE###" },
+            # README.md Repository Architecture section patterns
+            @{ Pattern = "| ``$SourceName/`` | **Production template**"; Placeholder = "###README_PROD_TEMPLATE###" },
+            @{ Pattern = "- ``$SourceName/`` is the **source of truth**"; Placeholder = "###README_SOURCE_TRUTH###" },
+            @{ Pattern = "create ``$TargetName/`` from ``$SourceName/``"; Placeholder = "###README_CREATE_FROM###" },
+            @{ Pattern = "Changes flow: ``$SourceName/``"; Placeholder = "###README_CHANGES_FLOW###" },
+            @{ Pattern = "| ``$SourceName/`` | Template for end users"; Placeholder = "###README_CONTRIB_TEMPLATE###" },
+            @{ Pattern = "Copy changes back to ``$SourceName/``"; Placeholder = "###README_COPY_BACK###" },
+            @{ Pattern = "``$SourceName/VERSION``"; Placeholder = "###README_VERSION_SOURCE###" }
         )
         
         # Protect contextual patterns

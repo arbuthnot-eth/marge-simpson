@@ -253,7 +253,11 @@ if ($bashAvailable) {
     }
 } else {
     Write-Host "    [SKIP] " -NoNewline -ForegroundColor DarkYellow
-    Write-Host "Bash syntax tests - bash not available (install Git Bash or WSL)" -ForegroundColor DarkYellow
+    Write-Host "Bash syntax tests - bash not available" -ForegroundColor DarkYellow
+    Write-Host "           " -NoNewline
+    Write-Host "To enable: Install Git Bash (https://git-scm.com) or WSL" -ForegroundColor DarkGray
+    Write-Host "           " -NoNewline
+    Write-Host "Windows-only usage is fully supported without bash tests" -ForegroundColor DarkGray
 }
 
 # Test 3: Folder name detection
