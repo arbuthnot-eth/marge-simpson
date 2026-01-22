@@ -328,11 +328,11 @@ _No entries yet._
     Write-Host "  Reset: instructions_log.md" -ForegroundColor Gray
 }
 
-# Clear verify_logs
+# Clear verify_logs (keep .gitignore and .gitkeep)
 $verifyLogsPath = Join-Path $targetFolder "verify_logs"
 if (Test-Path $verifyLogsPath) {
-    Get-ChildItem -Path $verifyLogsPath -File -ErrorAction SilentlyContinue | Remove-Item -Force
-    Write-Host "  Cleared: verify_logs/" -ForegroundColor Gray
+    Get-ChildItem -Path $verifyLogsPath -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '^\.git(ignore|keep)$' } | Remove-Item -Force
+    Write-Host "  Cleared: verify_logs/ (preserved .gitignore, .gitkeep)" -ForegroundColor Gray
 }
 
 # Transform AGENTS.md for meta_marge (add audit exclusion rule)
