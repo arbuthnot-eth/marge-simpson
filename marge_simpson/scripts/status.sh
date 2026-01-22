@@ -171,48 +171,6 @@ get_knowledge_stats() {
     done
 }
 
-get_last_verification() {
-    local logs_path="$MS_DIR/verify_logs"
-    
-    VERIFY_STATUS="No logs"
-    VERIFY_TIMESTAMP=""
-    VERIFY_COLOR="$GRAY"
-    
-    if [[ ! -d "$logs_path" ]]; then
-        return
-    fi
-    
-    # Get most recent log file
-    local latest_log
-    latest_log=$(ls -t "$logs_path"/*.log 2>/dev/null | head -n1 || echo "")
-    
-    if [[ -z "$latest_log" || ! -f "$latest_log" ]]; then
-        return
-    fi
-    
-    # Get timestamp
-    if [[ "$(uname)" == "Darwin" ]]; then
-        VERIFY_TIMESTAMP=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$latest_log" 2>/dev/null || echo "")
-    else
-        VERIFY_TIMESTAMP=$(stat -c "%y" "$latest_log" 2>/dev/null | cut -d'.' -f1 || echo "")
-    fi
-    
-    # Check log content for pass/fail
-    local log_content
-    log_content=$(cat "$latest_log")
-    
-    if echo "$log_content" | grep -qiE "PASS|SUCCESS|All tests passed"; then
-        VERIFY_STATUS="PASS"
-        VERIFY_COLOR="$GREEN"
-    elif echo "$log_content" | grep -qiE "FAIL|ERROR|FAILURE"; then
-        VERIFY_STATUS="FAIL"
-        VERIFY_COLOR="$RED"
-    else
-        VERIFY_STATUS="UNKNOWN"
-        VERIFY_COLOR="$YELLOW"
-    fi
-}
-
 # ==============================================================================
 # MAIN
 # ==============================================================================
@@ -222,7 +180,6 @@ write_banner
 # Gather stats
 get_tasklist_stats
 get_knowledge_stats
-get_last_verification
 
 # Task Summary
 write_section "TASK SUMMARY"
@@ -272,15 +229,6 @@ if [[ $TOTAL_ALL -gt 0 ]]; then
     else
         echo -e "    ${GRAY}Progress            ${GRAY}[${FILLED_BAR}${EMPTY_BAR}] ${PCT}%${NC}"
     fi
-fi
-
-# Verification Status
-write_section "VERIFICATION"
-
-if [[ -n "$VERIFY_TIMESTAMP" ]]; then
-    write_row "Last Run" "$VERIFY_STATUS ($VERIFY_TIMESTAMP)" "$VERIFY_COLOR"
-else
-    write_row "Last Run" "$VERIFY_STATUS" "$VERIFY_COLOR"
 fi
 
 # Knowledge Base

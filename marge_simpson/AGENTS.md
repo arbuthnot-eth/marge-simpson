@@ -29,7 +29,7 @@
 |------|---------|
 | `assessment.md` | Findings + root cause + verification evidence |
 | `tasklist.md` | Work queue: backlog → in-progress → done |
-| `instructions_log.md` | Standing user instructions |
+
 | `plans/[name]_MS-XXXX.md` | Feature plans (created for each feature) |
 ```
 IMPLEMENT → VERIFY → RECORD → COMPLETE

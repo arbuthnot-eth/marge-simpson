@@ -167,47 +167,6 @@ function Get-KnowledgeStats {
     return $stats
 }
 
-function Get-LastVerification {
-    $logsPath = Join-Path $MsDir "verify_logs"
-    
-    $result = @{
-        Status = "No logs"
-        Timestamp = $null
-        Color = "DarkGray"
-    }
-    
-    if (-not (Test-Path $logsPath)) {
-        return $result
-    }
-    
-    # Get most recent log file
-    $latestLog = Get-ChildItem -Path $logsPath -Filter "*.log" | 
-                 Sort-Object LastWriteTime -Descending | 
-                 Select-Object -First 1
-    
-    if (-not $latestLog) {
-        return $result
-    }
-    
-    $result.Timestamp = $latestLog.LastWriteTime.ToString("yyyy-MM-dd HH:mm")
-    
-    # Check log content for pass/fail
-    $logContent = Get-Content -Path $latestLog.FullName -Raw
-    
-    if ($logContent -match "PASSED|SUCCESS|All tests passed") {
-        $result.Status = "PASS"
-        $result.Color = "Green"
-    } elseif ($logContent -match "FAILED|ERROR|FAILURE") {
-        $result.Status = "FAIL"
-        $result.Color = "Red"
-    } else {
-        $result.Status = "UNKNOWN"
-        $result.Color = "Yellow"
-    }
-    
-    return $result
-}
-
 # ==============================================================================
 # MAIN
 # ==============================================================================
@@ -217,7 +176,6 @@ Write-Banner
 # Gather stats
 $taskStats = Get-TasklistStats
 $knowledgeStats = Get-KnowledgeStats
-$verifyResult = Get-LastVerification
 
 # Task Summary
 Write-Section "TASK SUMMARY"
@@ -244,15 +202,6 @@ if ($totalAll -gt 0) {
 }
 
 # Verification Status
-Write-Section "VERIFICATION"
-
-$verifyDisplay = if ($verifyResult.Timestamp) { 
-    "$($verifyResult.Status) ($($verifyResult.Timestamp))" 
-} else { 
-    $verifyResult.Status 
-}
-Write-Row "Last Run" $verifyDisplay $verifyResult.Color
-
 # Knowledge Base
 Write-Section "KNOWLEDGE BASE"
 

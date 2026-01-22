@@ -130,3 +130,33 @@ If user provides multiple items:
 | Not sure if bug or feature | Pick one, note your assumption, proceed |
 
 The label is for humans. The process is the same.
+
+---
+
+## Response Format
+
+When delivering work, output:
+
+```
++=======================================================+
+|    __  __    _    ____   ____ _____                   |
+|   |  \/  |  / \  |  _ \ / ___| ____|                  |
+|   | |\/| | / _ \ | |_) | |  _|  _|                    |
+|   | |  | |/ ___ \|  _ <| |_| | |___                   |
+|   |_|  |_/_/   \_\_| \_\\____|_____|   WORK COMPLETE  |
++=======================================================+
+```
+
+| Field | Value |
+|-------|-------|
+| IDs Touched | MS-000X, MS-000Y |
+| Files Modified | `file1.ts`, `file2.ts` |
+| Status | ✓ VERIFIED / ⚠ NEEDS ATTENTION |
+
+### What Changed
+- (Bullet list of changes)
+
+### Verification Evidence
+```
+(Raw output or log path)
+```

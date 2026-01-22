@@ -148,11 +148,6 @@ foreach ($file in $allFiles) {
     # Determine if this is a text file
     $isTextFile = ($textExtensions -contains $ext) -or ($textFilenames -contains $name) -or ($ext -eq "")
     
-    # Skip binary files and verify_logs
-    if ($file.FullName -like "*\verify_logs\*") {
-        continue
-    }
-    
     # Skip dual-folder documentation files (they intentionally contain both folder names)
     $relPath = $file.FullName.Substring($targetFolder.Length + 1)
     $isDualFolderDoc = $dualFolderDocFiles | Where-Object { $relPath -like "*$_" }
@@ -312,29 +307,6 @@ _None_
     Write-Host "  Reset: tasklist.md" -ForegroundColor Gray
 }
 
-# Reset instructions_log.md
-$instructionsLogPath = Join-Path $targetFolder "instructions_log.md"
-if (Test-Path $instructionsLogPath) {
-    $instructionsLogContent = @"
-# $TargetName Instructions Log
-
-> Log of instructions and decisions during meta-development.
-
----
-
-_No entries yet._
-"@
-    Set-Content -Path $instructionsLogPath -Value $instructionsLogContent
-    Write-Host "  Reset: instructions_log.md" -ForegroundColor Gray
-}
-
-# Clear verify_logs (keep .gitignore and .gitkeep)
-$verifyLogsPath = Join-Path $targetFolder "verify_logs"
-if (Test-Path $verifyLogsPath) {
-    Get-ChildItem -Path $verifyLogsPath -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '^\.git(ignore|keep)$' } | Remove-Item -Force
-    Write-Host "  Cleared: verify_logs/ (preserved .gitignore, .gitkeep)" -ForegroundColor Gray
-}
-
 # Clear plans/ folder (keep .gitkeep and _template.md)
 $plansPath = Join-Path $targetFolder "plans"
 if (Test-Path $plansPath) {
@@ -368,8 +340,6 @@ Write-Host "[5/5] Verifying conversion..." -ForegroundColor Green
 $remainingRefs = 0
 $expectedRefs = 0
 foreach ($file in (Get-ChildItem -Path $targetFolder -Recurse -File)) {
-    if ($file.FullName -like "*\verify_logs\*") { continue }
-    
     $relPath = $file.FullName.Substring($targetFolder.Length + 1)
     $isDualFolderDoc = $dualFolderDocFiles | Where-Object { $relPath -like "*$_" }
     

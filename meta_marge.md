@@ -41,9 +41,8 @@ When you're done improving Marge via meta_marge:
 The script:
 1. Copies `marge_simpson/` → `meta_marge/`
 2. Transforms ALL text files, replacing `marge_simpson` → `meta_marge` in paths and references
-3. Resets work queues (assessment.md, tasklist.md, instructions_log.md) to a clean slate
-4. Clears verify_logs/
-5. Runs verification to confirm everything works
+3. Resets work queues (assessment.md, tasklist.md) to a clean slate
+4. Runs verification to confirm everything works
 
 ### Option 2: Manual Conversion
 
@@ -60,11 +59,9 @@ The script:
    - `"marge_simpson"` → `"meta_marge"`
    - Any other references
 
-3. **Reset work queues** (assessment.md, tasklist.md, instructions_log.md)
+3. **Reset work queues** (assessment.md, tasklist.md)
 
-4. **Clear verify_logs/**
-
-5. **Test:**
+4. **Test:**
    ```powershell
    .\meta_marge\scripts\verify.ps1 fast
    ```
@@ -102,7 +99,7 @@ The script transforms any file with these extensions:
 - `.xml`, `.config`, `.cfg`, `.ini`
 - And more...
 
-Binary files and `verify_logs/` are skipped.
+Binary files are skipped.
 
 ---
 
@@ -174,7 +171,7 @@ If `.\meta_marge\scripts\verify.ps1 fast` fails:
 
 ### Want to keep work queue history?
 
-By default, the script resets assessment.md, tasklist.md, and instructions_log.md to clean states. If you want to preserve them:
+By default, the script resets assessment.md and tasklist.md to clean states. If you want to preserve them:
 1. Backup the files before running the script
 2. Restore them after the conversion
 3. Manually update any `marge_simpson` references to `meta_marge`
