@@ -342,7 +342,7 @@ if (Test-Path $plansPath) {
     Write-Host "  Cleared: plans/ (preserved .gitkeep, _template.md)" -ForegroundColor Gray
 }
 
-# Transform AGENTS.md for meta_marge (add audit exclusion rule)
+# Transform AGENTS.md for meta_marge (remove conditional clause)
 $agentsPath = Join-Path $targetFolder "AGENTS.md"
 if (Test-Path $agentsPath) {
     $agentsContent = Get-Content -Path $agentsPath -Raw
@@ -354,8 +354,8 @@ if (Test-Path $agentsPath) {
         $agentsContent = $agentsContent.Replace($conditionalPattern, "")
         Set-Content -Path $agentsPath -Value $agentsContent -NoNewline
         Write-Host "  Updated: AGENTS.md (removed conditional clause for meta_marge)" -ForegroundColor Gray
-    } elseif ($agentsContent -match "excluded from audits and issue scans - it is the tooling, not the target\.`n") {
-        Write-Host "  AGENTS.md already has correct audit exclusion rule" -ForegroundColor Gray
+    } elseif ($agentsContent -match "\*\*excluded from audits\*\*.*it is the tooling, not the target\.") {
+        Write-Host "  AGENTS.md has correct audit exclusion rule (no conditional needed for meta_marge)" -ForegroundColor Gray
     } else {
         Write-Host "  WARNING: AGENTS.md has unexpected format - check manually" -ForegroundColor Yellow
     }

@@ -2,7 +2,10 @@
 
 **Priority:** correctness > safety > minimal diffs > speed
 
-**Scope:** The `marge_simpson/` folder is tooling, not target. Never create marge_simpson files outside this folder.
+**Scope (CRITICAL):**
+1. The `marge_simpson/` folder is **excluded from audits** — it is the tooling, not the target, unless `meta_marge/` exists and is being used to update Marge.
+2. Audit the workspace/repo OUTSIDE this folder. Track findings HERE in `assessment.md` and `tasklist.md`.
+3. Never create marge_simpson files outside this folder.
 
 ---
 
@@ -14,6 +17,7 @@
 4. **Minimal changes** — Fewest files/lines necessary
 5. **Capture the why** — Document WHY fixes work, not just what changed
 6. **No secrets in code** — Use env vars
+7. **Uncertainty disclosure** — State what you checked, what you know, what remains unknown
 
 **Major changes** (architecture, schema, API contracts) → Stop, get approval with plan + risks.
 
@@ -47,13 +51,13 @@ IMPLEMENT → VERIFY → RECORD → COMPLETE
 
 | Intent | Action |
 |--------|--------|
-| Question | Answer directly |
+| Question | Answer directly (no ID unless issue found) |
 | Work (fix, add, change) | Read `workflows/work.md`, create MS-#### |
 | Audit | Read `workflows/audit.md` first |
 | Planning mode (`PLANNING ONLY`, `plan only`) | Read `workflows/planning.md` — NO code changes |
 | Loop mode (`loop until clean`) | Read `workflows/loop.md` |
 
-**Mixed intent** (e.g., question + feature + bug): Answer questions inline (no ID), then process each work item per `work.md` (each gets MS-####).
+**Mixed intent** (e.g., question + feature + bug): Answer questions inline (no ID unless issue found), then process each work item per `work.md` (each gets MS-####).
 
 ---
 

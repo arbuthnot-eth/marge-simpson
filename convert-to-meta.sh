@@ -316,8 +316,8 @@ if [[ -f "$AGENTS_PATH" ]]; then
       sed -i "s/, unless \`${TARGET_NAME}\/\` exists and is being used to update Marge//g" "$AGENTS_PATH"
     fi
     echo "  Updated: AGENTS.md (removed conditional clause for meta_marge)"
-  elif grep -q "excluded from audits and issue scans - it is the tooling, not the target\." "$AGENTS_PATH"; then
-    echo "  AGENTS.md already has correct audit exclusion rule"
+  elif grep -q "\*\*excluded from audits\*\*.*it is the tooling, not the target\." "$AGENTS_PATH"; then
+    echo "  AGENTS.md has correct audit exclusion rule (no conditional needed for meta_marge)"
   else
     echo "  WARNING: AGENTS.md has unexpected format - check manually"
   fi
