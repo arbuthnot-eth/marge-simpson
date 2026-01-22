@@ -11,9 +11,48 @@ User wants something **done** - any of:
 - Improve / enhance existing functionality
 - Refactor / clean up code
 
+## Pre-Work: Load Relevant Context
+
+### 1. Check Experts (if task has domain keywords)
+
+Read `experts/_index.md` and scan for keywords matching your task:
+
+| Task Keywords | Load File |
+|---------------|----------|
+| security, auth, GDPR | `experts/security.md` |
+| test, coverage, QA | `experts/testing.md` |
+| deploy, CI/CD, docker | `experts/devops.md` |
+| architecture, API, scale | `experts/architecture.md` |
+| UI, UX, accessibility | `experts/design.md` |
+
+**Skip if:** Simple bug fix or task doesn't match any domain keywords.
+
+### 2. Check Knowledge (for prior decisions)
+
+Grep `knowledge/decisions.md` for tags related to your task:
+
+```powershell
+Select-String -Path "marge_simpson/knowledge/decisions.md" -Pattern "#auth|#api|#database"
+```
+
+**Apply any relevant decisions** — don't contradict prior architectural choices without explicit approval.
+
+**Skip if:** Knowledge files are empty or task is isolated.
+
 ## Work Intake
 
-### For NEW work (no existing ID)
+### For FEATURES (type: feature)
+
+1. Create the next MS-#### ID
+2. Create plan file: `plans/[feature-name]_MS-####.md`
+   - Copy from `plans/_template.md`
+   - Fill in: Goal, Approach, Why, Risks
+   - List sub-tasks (each gets own MS-#### ID)
+3. Add entry to `assessment.md` referencing the plan
+4. Add task(s) to `tasklist.md` with parent reference
+5. Increment `Next ID` in BOTH files
+
+### For BUGS/IMPROVEMENTS/REFACTORS
 
 1. Create the next MS-#### ID
 2. Add entry to `marge_simpson/assessment.md`:
@@ -119,3 +158,33 @@ If user provides multiple items:
 | Not sure if bug or feature | Pick one, note your assumption, proceed |
 
 The label is for humans. The process is the same.
+
+---
+
+## Response Format
+
+When delivering work, output:
+
+```
++=======================================================+
+|    __  __    _    ____   ____ _____                   |
+|   |  \/  |  / \  |  _ \ / ___| ____|                  |
+|   | |\/| | / _ \ | |_) | |  _|  _|                    |
+|   | |  | |/ ___ \|  _ <| |_| | |___                   |
+|   |_|  |_/_/   \_\_| \_\\____|_____|   WORK COMPLETE  |
++=======================================================+
+```
+
+| Field | Value |
+|-------|-------|
+| IDs Touched | MS-000X, MS-000Y |
+| Files Modified | `file1.ts`, `file2.ts` |
+| Status | ✓ VERIFIED / ⚠ NEEDS ATTENTION |
+
+### What Changed
+- (Bullet list of changes)
+
+### Verification Evidence
+```
+(Raw output or log path)
+```

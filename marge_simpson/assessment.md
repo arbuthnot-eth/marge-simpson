@@ -59,5 +59,5 @@ AI/Agents must read `marge_simpson/AGENTS.md` before working.
   - Commands executed:
     - `./marge_simpson/scripts/verify.sh fast` (or `./marge_simpson/scripts/verify.ps1 fast`)
     - (any targeted command)
-  - Evidence: paste raw output OR reference `marge_simpson/verify_logs/...`
+  - Evidence: paste raw output
 - **Notes / follow-ups:** Any remaining risk or cleanup

@@ -32,16 +32,11 @@ MS_DIR="$(cd "$SCRIPTS_DIR/.." && pwd)"
 MS_FOLDER_NAME="$(basename "$MS_DIR")"
 ROOT_DIR="$(cd "$MS_DIR/.." && pwd)"
 CONF="$MS_DIR/verify.config.json"
-LOG_DIR="$MS_DIR/verify_logs"
-
-mkdir -p "$LOG_DIR"
-TS="$(date +"%Y%m%d_%H%M%S")"
-LOG_FILE="$LOG_DIR/verify_${PROFILE}_${TS}.log"
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
 say() {
-  echo "$@" | tee -a "$LOG_FILE"
+  echo "$@"
 }
 
 # Cross-platform command adaptation
@@ -83,7 +78,7 @@ run_cmd() {
   say ""
   say "==> $cmd"
   # shellcheck disable=SC2086
-  (cd "$ROOT_DIR" && bash -c "$cmd") 2>&1 | tee -a "$LOG_FILE"
+  (cd "$ROOT_DIR" && bash -c "$cmd") 2>&1
 }
 
 read_config_commands() {

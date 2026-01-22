@@ -62,4 +62,4 @@ AI/Agents must read `marge_simpson/AGENTS.md` before working.
   - **Expert(s):** (optional) Relevant expert persona(s) from `EXPERT_REGISTRY.md`
   - **Verification:**
     - Commands run: …
-    - Evidence: (paste raw output or point to `marge_simpson/verify_logs/...`)
+    - Evidence: (paste raw output)

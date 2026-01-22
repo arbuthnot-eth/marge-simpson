@@ -91,11 +91,6 @@ SKIPPED_COUNT=0
 
 # Find all files and transform them
 while IFS= read -r -d '' file; do
-  # Skip verify_logs
-  if [[ "$file" == *"/verify_logs/"* ]]; then
-    continue
-  fi
-  
   # Check if it's a text file by extension or known filename
   filename=$(basename "$file")
   ext="${filename##*.}"
@@ -278,28 +273,6 @@ EOF
   echo "  Reset: tasklist.md"
 fi
 
-# Reset instructions_log.md
-INSTRUCTIONS_PATH="$TARGET_FOLDER/instructions_log.md"
-if [[ -f "$INSTRUCTIONS_PATH" ]]; then
-  cat > "$INSTRUCTIONS_PATH" << EOF
-# $TARGET_NAME Instructions Log
-
-> Log of instructions and decisions during meta-development.
-
----
-
-_No entries yet._
-EOF
-  echo "  Reset: instructions_log.md"
-fi
-
-# Clear verify_logs (only *.log files - preserves .gitignore and .gitkeep)
-VERIFY_LOGS_PATH="$TARGET_FOLDER/verify_logs"
-if [[ -d "$VERIFY_LOGS_PATH" ]]; then
-  find "$VERIFY_LOGS_PATH" -type f -name "*.log" -delete 2>/dev/null || true
-  echo "  Cleared: verify_logs/ (preserved .gitignore, .gitkeep)"
-fi
-
 # Transform AGENTS.md for meta_marge (remove conditional clause)
 AGENTS_PATH="$TARGET_FOLDER/AGENTS.md"
 if [[ -f "$AGENTS_PATH" ]]; then
@@ -316,8 +289,8 @@ if [[ -f "$AGENTS_PATH" ]]; then
       sed -i "s/, unless \`${TARGET_NAME}\/\` exists and is being used to update Marge//g" "$AGENTS_PATH"
     fi
     echo "  Updated: AGENTS.md (removed conditional clause for meta_marge)"
-  elif grep -q "excluded from audits and issue scans - it is the tooling, not the target\." "$AGENTS_PATH"; then
-    echo "  AGENTS.md already has correct audit exclusion rule"
+  elif grep -q "\*\*excluded from audits\*\*.*it is the tooling, not the target\." "$AGENTS_PATH"; then
+    echo "  AGENTS.md has correct audit exclusion rule (no conditional needed for meta_marge)"
   else
     echo "  WARNING: AGENTS.md has unexpected format - check manually"
   fi
@@ -329,9 +302,6 @@ echo "[5/5] Verifying conversion..."
 # Check for any remaining source name references
 REMAINING_REFS=0
 while IFS= read -r -d '' file; do
-  if [[ "$file" == *"/verify_logs/"* ]]; then
-    continue
-  fi
   if grep -q "\\b$SOURCE_NAME\\b" "$file" 2>/dev/null; then
     rel_path="${file#$TARGET_FOLDER/}"
     echo "  WARNING: '$SOURCE_NAME' still found in: $rel_path"
