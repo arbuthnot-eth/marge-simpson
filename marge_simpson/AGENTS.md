@@ -118,6 +118,25 @@ When the user's message includes phrases like:
 └─────────────────────────────────────┘
 ```
 
+**Loop validation by work type:**
+
+| Work Type | Loop Validates Until... |
+|-----------|------------------------|
+| **Feature** | Fully implemented, all edge cases handled, tests pass |
+| **Bug/Issue** | Root cause fixed, no regressions, verification passes |
+| **Instruction** | All instructions executed correctly and completely |
+| **Audit** | Zero new findings on full re-scan |
+| **Confirmation** | The specific item is verified as truly resolved |
+| **Question** | ⛔ NO LOOP - answer once, done |
+| **Planning** | ⛔ NO LOOP - proposals/brainstorms don't iterate |
+
+**When NOT to loop (auto-skip even if triggered):**
+- Pure questions (curiosity, "how", "why", "what does X do")
+- Planning mode prompts (contains "PLANNING ONLY" or "no code changes")
+- Already-answered items in a mixed prompt
+
+**Mixed prompts:** Loop applies ONLY to work items, not questions. Answer questions once, then loop on the actionable work.
+
 **Loop rules:**
 - The loop validates **the specific work requested** (not generic scanning)
 - Keep a short "Pass N" log of what was found/improved/completed
@@ -128,6 +147,8 @@ When the user's message includes phrases like:
 - Feature request + loop → Keep refining until feature is complete and tested
 - Bug fix + loop → Keep fixing until bug is fully resolved with no regressions
 - Audit + loop → Keep scanning until zero new issues found
+- Question + loop → Loop ignored, answer provided once
+- Planning + loop → Loop ignored, proposals provided once
 
 ---
 
