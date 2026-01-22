@@ -82,9 +82,18 @@ Pricing in `marge_simpson/model_pricing.json`.
 
 ---
 
-## Resources
+## Resources (Active Routing)
 
-Read only when needed:
-- `workflows/_index.md` → find the right workflow
-- `experts/_index.md` → domain expertise (if exists)
-- `knowledge/_index.md` → preferences, decisions, patterns
+**Load based on task type:**
+
+| Situation | Read First |
+|-----------|------------|
+| Any work task | `knowledge/_index.md` → check for relevant decisions |
+| Domain-specific work | `experts/_index.md` → load matching expert file |
+| Unsure which workflow | `workflows/_index.md` → find the right one |
+
+**Quick keyword scan:**
+- Security/auth/compliance → `experts/security.md`
+- Testing/QA/coverage → `experts/testing.md`  
+- Deploy/CI-CD/infra → `experts/devops.md`
+- Architecture/API/scale → `experts/architecture.md`

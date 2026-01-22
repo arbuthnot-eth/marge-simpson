@@ -11,6 +11,34 @@ User wants something **done** - any of:
 - Improve / enhance existing functionality
 - Refactor / clean up code
 
+## Pre-Work: Load Relevant Context
+
+### 1. Check Experts (if task has domain keywords)
+
+Read `experts/_index.md` and scan for keywords matching your task:
+
+| Task Keywords | Load File |
+|---------------|----------|
+| security, auth, GDPR | `experts/security.md` |
+| test, coverage, QA | `experts/testing.md` |
+| deploy, CI/CD, docker | `experts/devops.md` |
+| architecture, API, scale | `experts/architecture.md` |
+| UI, UX, accessibility | `experts/design.md` |
+
+**Skip if:** Simple bug fix or task doesn't match any domain keywords.
+
+### 2. Check Knowledge (for prior decisions)
+
+Grep `knowledge/decisions.md` for tags related to your task:
+
+```powershell
+Select-String -Path "marge_simpson/knowledge/decisions.md" -Pattern "#auth|#api|#database"
+```
+
+**Apply any relevant decisions** — don't contradict prior architectural choices without explicit approval.
+
+**Skip if:** Knowledge files are empty or task is isolated.
+
 ## Work Intake
 
 ### For FEATURES (type: feature)
