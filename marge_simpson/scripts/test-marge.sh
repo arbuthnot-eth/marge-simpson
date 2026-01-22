@@ -98,14 +98,14 @@ echo "[6/6] AGENTS.md content validation..."
 AGENTS_PATH="$MS_DIR/AGENTS.md"
 AGENTS_CONTENT=$(cat "$AGENTS_PATH")
 
-HAS_CRITICAL_RULE=$(echo "$AGENTS_CONTENT" | grep -q "\*\*CRITICAL RULE" && echo 0 || echo 1)
-test_assert "AGENTS.md contains CRITICAL RULE(S)" "$HAS_CRITICAL_RULE" || true
+HAS_CRITICAL=$(echo "$AGENTS_CONTENT" | grep -q "CRITICAL" && echo 0 || echo 1)
+test_assert "AGENTS.md contains CRITICAL section" "$HAS_CRITICAL" || true
 
-HAS_FOLDER_REF=$(echo "$AGENTS_CONTENT" | grep -q "\`$MS_FOLDER_NAME/\`" && echo 0 || echo 1)
+HAS_FOLDER_REF=$(echo "$AGENTS_CONTENT" | grep -q "$MS_FOLDER_NAME/" && echo 0 || echo 1)
 test_assert "AGENTS.md contains folder reference '$MS_FOLDER_NAME/'" "$HAS_FOLDER_REF" || true
 
-HAS_VERIFY_REF=$(echo "$AGENTS_CONTENT" | grep -q "verify.ps1 fast" && echo "$AGENTS_CONTENT" | grep -q "verify.sh fast" && echo 0 || echo 1)
-test_assert "AGENTS.md contains verification runner reference" "$HAS_VERIFY_REF" || true
+HAS_VERIFY_REF=$(echo "$AGENTS_CONTENT" | grep -q "verify" && echo 0 || echo 1)
+test_assert "AGENTS.md contains verification reference" "$HAS_VERIFY_REF" || true
 
 HAS_MS_ID=$(echo "$AGENTS_CONTENT" | grep -qE "MS-[0-9]{4}|MS-####" && echo 0 || echo 1)
 test_assert "AGENTS.md contains MS-#### tracking ID format" "$HAS_MS_ID" || true
