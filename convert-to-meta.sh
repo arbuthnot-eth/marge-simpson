@@ -156,24 +156,25 @@ while IFS= read -r -d '' file; do
   content=${content//".\\$SOURCE_NAME\\"/".\\$TARGET_NAME\\"}
   content=${content//"$SOURCE_NAME\\"/"$TARGET_NAME\\"}
   
-  # Apply replacements using sed
-  # We use a temp variable approach to avoid issues with special characters
+  # Apply replacements - using bash parameter expansion where possible
+  # shellcheck disable=SC2001  # sed needed for complex pattern escaping
   content=$(echo "$content" | sed "s|\\./$SOURCE_NAME/|./$TARGET_NAME/|g")
-  content=$(echo "$content" | sed "s|$SOURCE_NAME/|$TARGET_NAME/|g")
-  content=$(echo "$content" | sed "s|\\[$SOURCE_NAME\\]|[$TARGET_NAME]|g")
-  content=$(echo "$content" | sed "s|'$SOURCE_NAME'|'$TARGET_NAME'|g")
-  content=$(echo "$content" | sed "s|\"$SOURCE_NAME\"|\"$TARGET_NAME\"|g")
-  content=$(echo "$content" | sed "s|\`$SOURCE_NAME\`|\`$TARGET_NAME\`|g")
-  content=$(echo "$content" | sed "s| $SOURCE_NAME | $TARGET_NAME |g")
-  content=$(echo "$content" | sed "s| $SOURCE_NAME\\.| $TARGET_NAME.|g")
-  content=$(echo "$content" | sed "s| $SOURCE_NAME,| $TARGET_NAME,|g")
-  content=$(echo "$content" | sed "s| $SOURCE_NAME:| $TARGET_NAME:|g")
-  content=$(echo "$content" | sed "s|($SOURCE_NAME)|($TARGET_NAME)|g")
-  content=$(echo "$content" | sed "s|: $SOURCE_NAME|: $TARGET_NAME|g")
-  content=$(echo "$content" | sed "s|# $SOURCE_NAME|# $TARGET_NAME|g")
-  content=$(echo "$content" | sed "s|=$SOURCE_NAME|=$TARGET_NAME|g")
+  content=${content//"$SOURCE_NAME/"/"$TARGET_NAME/"}
+  content=${content//"[$SOURCE_NAME]"/"[$TARGET_NAME]"}
+  content=${content//"'$SOURCE_NAME'"/"'$TARGET_NAME'"}
+  content=${content//"\"$SOURCE_NAME\""/"\"$TARGET_NAME\""}
+  content=${content//"\`$SOURCE_NAME\`"/"\`$TARGET_NAME\`"}
+  content=${content//" $SOURCE_NAME "/" $TARGET_NAME "}
+  content=${content//" $SOURCE_NAME."/" $TARGET_NAME."}
+  content=${content//" $SOURCE_NAME,"/" $TARGET_NAME,"}
+  content=${content//" $SOURCE_NAME:"/" $TARGET_NAME:"}
+  content=${content//"($SOURCE_NAME)"/"($TARGET_NAME)"}
+  content=${content//": $SOURCE_NAME"/": $TARGET_NAME"}
+  content=${content//"# $SOURCE_NAME"/"# $TARGET_NAME"}
+  content=${content//"=$SOURCE_NAME"/"=$TARGET_NAME"}
   
   # Final word-boundary replacement for any remaining instances (portable sed)
+  # shellcheck disable=SC2001  # sed needed for regex word boundaries
   content=$(echo "$content" | sed -E "s/(^|[^[:alnum:]_])$SOURCE_NAME([^[:alnum:]_]|$)/\\1$TARGET_NAME\\2/g")
   
   # Restore protected contextual patterns
