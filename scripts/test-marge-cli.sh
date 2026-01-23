@@ -98,26 +98,7 @@ fi
 echo ""
 
 # ============================================================
-# Test 2: Historical backup exists
-# ============================================================
-echo -e "${BLUE}Test Group: Historical Backup${NC}"
-
-if [[ -f "$SHARED_DIR/bak/OLD_AGENTS.md" ]]; then
-    test_pass "bak/OLD_AGENTS.md exists"
-else
-    test_fail "bak/OLD_AGENTS.md missing"
-fi
-
-if [[ -f "$SHARED_DIR/bak/OLD_AGENTS.md" ]] && grep -q "Historical Reference" "$SHARED_DIR/bak/OLD_AGENTS.md"; then
-    test_pass "OLD_AGENTS.md contains historical reference note"
-else
-    test_fail "OLD_AGENTS.md missing historical reference note"
-fi
-
-echo ""
-
-# ============================================================
-# Test 3: CLI scripts exist
+# Test 2: CLI scripts exist
 # ============================================================
 echo -e "${BLUE}Test Group: CLI Scripts${NC}"
 

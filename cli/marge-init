@@ -77,7 +77,6 @@ mkdir -p "$TARGET_DIR"
 SHARED_LINKS=(
     "AGENTS.md"
     "assets"
-    "bak"
     "experts"
     "knowledge"
     "model_pricing.json"

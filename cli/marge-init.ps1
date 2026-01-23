@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Initialize .marge/ in the current project directory.
 
@@ -71,7 +71,6 @@ New-Item -ItemType Directory -Force -Path "$TargetDir" | Out-Null
 $SharedLinks = @(
     "AGENTS.md",
     "assets",
-    "bak",
     "experts",
     "knowledge",
     "model_pricing.json",
@@ -155,15 +154,15 @@ if ($SymlinkFailed) {
 }
 
 Write-Host "  .marge\"
-Write-Host "  ├── AGENTS.md           → $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
-Write-Host "  ├── experts\            → $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
-Write-Host "  ├── workflows\          → $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
-Write-Host "  ├── scripts\            → $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
-Write-Host "  ├── knowledge\          → $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
-Write-Host "  ├── planning_docs\"
-Write-Host "  │   ├── assessment.md   (local - per-project)"
-Write-Host "  │   └── tasklist.md     (local - per-project)"
-Write-Host "  └── verify.config.json  (local - per-project)"
+Write-Host "  +-- AGENTS.md           -> $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
+Write-Host "  +-- experts\            -> $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
+Write-Host "  +-- workflows\          -> $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
+Write-Host "  +-- scripts\            -> $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
+Write-Host "  +-- knowledge\          -> $MargeHome\shared\ $(if($SymlinkFailed){'(copy)'}else{'(symlink)'})"
+Write-Host "  +-- planning_docs\"
+Write-Host "  |   +-- assessment.md   (local - per-project)"
+Write-Host "  |   +-- tasklist.md     (local - per-project)"
+Write-Host "  +-- verify.config.json  (local - per-project)"
 Write-Host ""
 Write-Host "Edit verify.config.json to configure your project's test commands."
 Write-Host ""
@@ -171,3 +170,4 @@ Write-Host "Ready to use marge! Start with:"
 Write-Host "  - Read .marge\AGENTS.md for workflow rules"
 Write-Host "  - Add tasks to .marge\planning_docs\tasklist.md"
 Write-Host "  - Run verification: .\.marge\scripts\verify.ps1 fast"
+

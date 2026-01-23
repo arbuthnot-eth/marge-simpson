@@ -69,7 +69,6 @@ mkdir -p "$INSTALL_DIR/shared" "$INSTALL_DIR/templates"
 SHARED_FILES=(
     "AGENTS.md"
     "assets"
-    "bak"
     "experts"
     "knowledge"
     "model_pricing.json"

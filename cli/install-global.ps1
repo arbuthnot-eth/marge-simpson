@@ -54,7 +54,6 @@ New-Item -ItemType Directory -Force -Path "$InstallDir\templates" | Out-Null
 $SharedItems = @(
     "AGENTS.md",
     "assets",
-    "bak",
     "experts",
     "knowledge",
     "model_pricing.json",

@@ -165,12 +165,12 @@ foreach ($file in $files) {
         $content = $content -replace [regex]::Escape("``$SourceName``"), "``$TargetName``"
         $content = $content -replace " $([regex]::Escape($SourceName)) ", " $TargetName "
         $content = $content -replace " $([regex]::Escape($SourceName))\.", " $TargetName."
-        $content = $content -replace " $([regex]::Escape($SourceName)),", " $TargetName,"
-        $content = $content -replace " $([regex]::Escape($SourceName)):", " $TargetName:"
+        $content = $content -replace " $([regex]::Escape($SourceName)),", " ${TargetName},"
+        $content = $content -replace " $([regex]::Escape($SourceName)):", " ${TargetName}:"
         $content = $content -replace "\($([regex]::Escape($SourceName))\)", "($TargetName)"
         $content = $content -replace ": $([regex]::Escape($SourceName))", ": $TargetName"
         $content = $content -replace "# $([regex]::Escape($SourceName))", "# $TargetName"
-        $content = $content -replace "=$([regex]::Escape($SourceName))", "=$TargetName"
+        $content = $content -replace "=$([regex]::Escape($SourceName))", "=${TargetName}"
         
         # Word boundary replacement
         $content = $content -replace "(?<![a-zA-Z0-9_])$([regex]::Escape($SourceName))(?![a-zA-Z0-9_])", $TargetName
@@ -257,9 +257,9 @@ _None_
 ## Done
 
 _None_
-\"@
+"@
     Set-Content -Path $TasklistPath -Value $tasklistContent
-    Write-Host \"  Reset: planning_docs/tasklist.md\"
+    Write-Host "  Reset: planning_docs/tasklist.md"
 }
 
 # Rewrite the AGENTS.md Scope section for meta-development
@@ -267,12 +267,16 @@ $AgentsPath = Join-Path $TargetFolder "AGENTS.md"
 if (Test-Path $AgentsPath) {
     $agentsContent = Get-Content -Path $AgentsPath -Raw
     
-    # Replace the scope line for meta-development
-    $newScopeLine = "1. The ``$TargetName/`` folder is **excluded from audits** — it is the tooling, not the target."
+    # Define the new scope section for .meta_marge
+    $newScope = @"
+**Scope (CRITICAL):**
+1. The ``$TargetName/`` folder is **excluded from audits** -- it is the tooling, not the target, and exists to update Marge.
+2. Audit the workspace/repo OUTSIDE this folder. Track findings HERE in ``$TargetName/planning_docs/`` assessment.md and tasklist.md.
+3. Never create ``$TargetName`` files outside this folder.
+"@
     
-    # Match either the source repo scope or the generic .marge scope
-    $agentsContent = $agentsContent -replace '1\. This folder \(`[^`]+/` or renamed\) is the \*\*Marge source repo\*\* — it IS the target.*$', $newScopeLine
-    $agentsContent = $agentsContent -replace '1\. This Marge folder \(`\.marge/` or similar\) is \*\*excluded from audits\*\*.*$', $newScopeLine
+    # Replace the entire Scope section (matches from **Scope to the line before ---)
+    $agentsContent = $agentsContent -replace '\*\*Scope \(CRITICAL\):\*\*\r?\n1\.[^\r\n]+\r?\n2\.[^\r\n]+\r?\n3\.[^\r\n]+', $newScope
     
     Set-Content -Path $AgentsPath -Value $agentsContent -NoNewline
     Write-Host "  Updated: AGENTS.md (scope section for meta-development)"

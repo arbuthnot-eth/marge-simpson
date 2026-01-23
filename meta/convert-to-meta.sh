@@ -248,14 +248,24 @@ fi
 # Rewrite the AGENTS.md Scope section for meta-development
 AGENTS_PATH="$TARGET_FOLDER/AGENTS.md"
 if [[ -f "$AGENTS_PATH" ]]; then
-  # Replace the entire Scope section with meta-specific version
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    sed -i '' 's/^1\. This folder.*IS the target.*$/1. The `'"$TARGET_NAME"'\/` folder is **excluded from audits** — it is the tooling, not the target./' "$AGENTS_PATH"
-    sed -i '' 's/^1\. This Marge folder.*excluded from audits.*$/1. The `'"$TARGET_NAME"'\/` folder is **excluded from audits** — it is the tooling, not the target./' "$AGENTS_PATH"
-  else
-    sed -i 's/^1\. This folder.*IS the target.*$/1. The `'"$TARGET_NAME"'\/` folder is **excluded from audits** — it is the tooling, not the target./' "$AGENTS_PATH"
-    sed -i 's/^1\. This Marge folder.*excluded from audits.*$/1. The `'"$TARGET_NAME"'\/` folder is **excluded from audits** — it is the tooling, not the target./' "$AGENTS_PATH"
-  fi
+  # Create the new scope section for .meta_marge
+  NEW_SCOPE="**Scope (CRITICAL):**
+1. The \`$TARGET_NAME/\` folder is **excluded from audits** -- it is the tooling, not the target, and exists to update Marge.
+2. Audit the workspace/repo OUTSIDE this folder. Track findings HERE in \`$TARGET_NAME/planning_docs/\` assessment.md and tasklist.md.
+3. Never create \`$TARGET_NAME\` files outside this folder."
+
+  # Read the file, replace the scope section, write back
+  # Using awk for multi-line replacement
+  awk -v new_scope="$NEW_SCOPE" '
+    /^\*\*Scope \(CRITICAL\):\*\*/ {
+      print new_scope
+      # Skip the next 3 lines (the old scope lines)
+      getline; getline; getline
+      next
+    }
+    { print }
+  ' "$AGENTS_PATH" > "${AGENTS_PATH}.tmp" && mv "${AGENTS_PATH}.tmp" "$AGENTS_PATH"
+  
   echo "  Updated: AGENTS.md (scope section for meta-development)"
 fi
 

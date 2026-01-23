@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **`cli/` directory** - Contains `marge`, `marge.ps1`, `marge-init`, and global install scripts
 - **`meta/` directory** - Contains `convert-to-meta.sh` and `convert-to-meta.ps1`
-- **`bak/` directory** - Historical backup for CLI test compatibility
+- **`scripts/test-syntax.ps1` and `.sh`** - Validates PowerShell/Bash script syntax at build time
 - **Simplified installation** - Clone repo as `.marge/` and use directly
 
 ### Fixed
