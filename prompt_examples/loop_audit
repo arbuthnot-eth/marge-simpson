@@ -1,23 +1,21 @@
 Lets consider version 1.2.1 and work our way up slowly. lets go again
 
-Read the AGENTS.md file in the .marge folder and follow it.
+Read the AGENTS.md file in the .meta_marge folder and follow it.
 
 Instructions::
-- audit for perfection.
-- audit all supporting docs
-- audit all file path references
-- audit all workflow paths, ensure there are no broken chains in the workflow, search for files that never get touched (aside from those that are specifically meant to be invoked manually)
-- audit the cli worflow, make sure it is compatible with our base layer
-- audit anything that needs auditing
-- audit logic, trace that logic checking for breaks in the chain
-- exclude .meta_marge in the audits
+- Audit the .meta_marge assessment and tasklist files. look for solid reasoning in the actions taken
+- audit marge-simpson and compare it to your assessment and tasklist file audit above, make sure all actions taken were good decisions
+- find an expert for the above, in the experts files of .mets_marge folder
+audit the newly added cli functions, make sure they are up to part with the intended functionality. reference whatever docs you need to acertsian inteded functionality
+- figure something out with the prd.md file in root. I dont know what that file is but perhaps it belongs in planning_docs folder? Ill let you decide. check what requires it also to make sure we need it and or whatever system that uses it is working well. its new so Im unfamiliar with it, I suspect its part of the recently merged cli features from another dev
+- when conflicts exist, pick the option that makes the most sense, not based on ease of implementation but based on what makes a more robust system as a hole. or look at the audit and infer which conflict if any wins out
 
 read only, update .meta_marge assessment and tasklist (etc) as you go
 
+loop until clean min 20
+
+1 loop is an ENTIRE audit of the workspace (excluding .meta_marge)
+
 Output using the Response Format (include IDs created). WITH DETAIL for the user to understand
 
-loop until clean min 60
-
-1 loop is anENTIRE audit of the workspace (excluding .meta_marge)
-
-in between each loop, fix the issues. do not stop between the loops. just audit, fix audit fix until yo uhit at least the min stated above, and keep looping beyind the min if there are still issues found until there are no more issues found.
+in between each loop, fix the issues. do not stop between the loops except to take a breif few second pause as to not tax github systems. just audit, fix audit fix until yo uhit at least the min stated above, and keep looping beyind the min if there are still issues found until there are no more issues found.
