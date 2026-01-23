@@ -1,46 +1,51 @@
 # Meta-Development Guide
 
-> How to work on Marge itself using Marge.
+> How to improve Marge itself using Marge.
 
 ## Overview
 
-Meta-development means improving the Marge system while using it. This creates a working copy (`.meta_marge/`) inside your workspace that's separate from the source, so you can make changes without affecting the production templates.
+Meta-development means improving the Marge system while using it. The `.meta_marge/` folder contains a copy of Marge's AGENTS.md and supporting files that **guide the AI to make improvements directly to the parent `marge-simpson/` folder**.
+
+**Key concept:** You don't edit files in `.meta_marge/` and copy them back. Instead, `.meta_marge/AGENTS.md` tells the AI to audit and improve `marge-simpson/` directly, while tracking work in `.meta_marge/planning_docs/`.
 
 ## Quick Start
 
 ```bash
-# 1. Create meta working copy
+# 1. Create meta guide folder
 ./meta/convert-to-meta.sh
-# Creates: .meta_marge/ (inside your workspace, gitignored)
+# Creates: .meta_marge/ (gitignored)
 
-# 2. Work on Marge using Marge
+# 2. Ask AI to improve Marge using the meta guide
 ./cli/marge --folder .meta_marge "run self-audit"
 # OR: ./cli/marge meta "run self-audit"
 # OR in chat: "Read AGENTS.md in .meta_marge and run a self-audit"
 
-# 3. When satisfied, manually copy specific changed files back
-#    Review changes carefully before committing
+# 3. AI reads .meta_marge/AGENTS.md which tells it to:
+#    - Audit marge-simpson/ (not .meta_marge/)
+#    - Make improvements directly to marge-simpson/
+#    - Track findings in .meta_marge/planning_docs/
 ```
 
 ## How It Works
 
 ```
-marge-simpson/              ← Repo root (source of truth, committed to git)
-├── AGENTS.md
+marge-simpson/              ← Target of improvements (committed to git)
+├── AGENTS.md               ← Production instructions
 ├── scripts/
-├── ...
-└── .meta_marge/            ← Working copy (gitignored)
-    ├── AGENTS.md           ← Edit to improve AI instructions
-    ├── workflows/          ← Edit workflow definitions
-    ├── experts/            ← Edit expert profiles
-    └── ...
+├── workflows/
+└── .meta_marge/            ← Meta guide (gitignored)
+    ├── AGENTS.md           ← Says "audit marge-simpson/, not me"
+    └── planning_docs/      ← Tracks meta-dev work
+        ├── assessment.md   ← Issues found
+        └── tasklist.md     ← Work queue
 
+AI reads .meta_marge/AGENTS.md
       ↓
- (make improvements using AI)
+Audits marge-simpson/ folder
       ↓
- (manually copy specific changes back to repo root)
+Makes fixes directly to marge-simpson/
       ↓
-marge-simpson/              ← Updated with improvements
+Tracks work in .meta_marge/planning_docs/
 ```
 
 ## The Conversion Process
@@ -49,23 +54,15 @@ marge-simpson/              ← Updated with improvements
 
 1. **Creates** `.meta_marge/` inside your workspace
 2. **Copies** all Marge files into it (excluding .git, node_modules)
-3. **Transforms** internal path references to `.meta_marge`
-4. **Resets** planning_docs/assessment.md and planning_docs/tasklist.md to clean state
+3. **Transforms** AGENTS.md scope to target `marge-simpson/` instead of external repos
+4. **Resets** planning_docs/ to clean state for new meta-dev session
 
 ## Commands
 
-### Create Meta Copy
+### Create Meta Guide
 ```bash
 ./meta/convert-to-meta.sh              # Creates .meta_marge/
 ./meta/convert-to-meta.sh -f           # Force overwrite existing
-```
-
-### Copy Changes Back
-```bash
-# Manual process - review what changed and copy specific files
-# There's no automatic reverse to encourage careful review
-diff -r .meta_marge/ ./                # Compare changes
-cp .meta_marge/AGENTS.md ./AGENTS.md   # Copy specific improved files
 ```
 
 ### PowerShell
@@ -77,26 +74,26 @@ cp .meta_marge/AGENTS.md ./AGENTS.md   # Copy specific improved files
 ## Best Practices
 
 1. **Always start fresh** — Run `convert-to-meta.sh` before each meta session
-2. **Test in meta first** — Verify improvements work in `.meta_marge/` before copying back
-3. **Review diffs** — Check changes carefully before copying back
-4. **Commit frequently** — Small, focused commits make review easier
+2. **Commit frequently** — Small, focused commits to marge-simpson/ make review easier
+3. **Run tests** — Use `./scripts/verify.ps1 fast` after changes
+4. **Track work** — The AI uses `.meta_marge/planning_docs/` to track findings
 
 ## Folder Structure
 
 ```
-.meta_marge/                  ← Your working copy (gitignored)
-├── AGENTS.md                 ← Edit this to improve AI instructions
-├── workflows/                ← Edit workflow definitions
-├── experts/                  ← Edit expert profiles
-├── planning_docs/            ← Track meta-dev work
-│   ├── assessment.md         ← Issues found during meta-dev
-│   └── tasklist.md           ← Meta-dev tasks
-└── ...
+.meta_marge/                  ← Meta guide (gitignored, NOT edited directly)
+├── AGENTS.md                 ← Guides AI to improve marge-simpson/
+├── workflows/                ← Reference for AI
+├── experts/                  ← Reference for AI
+├── planning_docs/            ← AI tracks meta-dev work here
+│   ├── assessment.md         ← Issues found in marge-simpson/
+│   └── tasklist.md           ← Work queue for improvements
+└── scripts/                  ← Can run tests from here too
 ```
 
 ## Tips
 
 - Use `./cli/marge meta "task"` as shortcut for `--folder .meta_marge`
-- The `.meta_marge/` folder is gitignored — your experiments won't pollute commits
-- Run audits frequently: `./cli/marge meta "audit this folder"`
-- All marge meta folders use the same name (`.meta_marge/`) regardless of source
+- The `.meta_marge/` folder is gitignored — won't pollute commits
+- Changes happen in `marge-simpson/`, not `.meta_marge/`
+- All meta folders use the same name (`.meta_marge/`) regardless of source

@@ -203,7 +203,7 @@ if (Test-Path $AssessmentPath) {
 # $TargetName Assessment
 
 > This file tracks issues found in the Marge system itself (meta-development).
-> Use this to improve the production Marge before copying changes back.
+> The AI reads .meta_marge/AGENTS.md and makes improvements directly to marge-simpson/.
 
 **Next ID:** MS-0001
 
@@ -326,7 +326,7 @@ if (Test-Path $VerifyScript) {
         Write-Host "============================================================" -ForegroundColor Green
         Write-Host ""
         Write-Host "You can now use $TargetName for meta-development."
-        Write-Host "Changes made there can be tested before copying back to $SourceName."
+        Write-Host "The .meta_marge/AGENTS.md will guide improvements directly to $SourceName."
     } else {
         Write-Host ""
         Write-Host "============================================================" -ForegroundColor Yellow

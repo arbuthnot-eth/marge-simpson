@@ -192,7 +192,7 @@ if [[ -f "$ASSESSMENT_PATH" ]]; then
 # $TARGET_NAME Assessment
 
 > This file tracks issues found in the Marge system itself (meta-development).
-> Use this to improve the production Marge before copying changes back.
+> The AI reads .meta_marge/AGENTS.md and makes improvements directly to marge-simpson/.
 
 **Next ID:** MS-0001
 
@@ -308,7 +308,7 @@ if [[ -x "$VERIFY_SCRIPT" ]]; then
     echo "============================================================"
     echo ""
     echo "You can now use $TARGET_NAME for meta-development."
-    echo "Changes made there can be tested before copying back to $SOURCE_NAME."
+    echo "The .meta_marge/AGENTS.md will guide improvements directly to $SOURCE_NAME."
   else
     echo ""
     echo "============================================================"

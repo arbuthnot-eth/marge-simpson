@@ -381,8 +381,8 @@ Want to improve Marge itself? See [meta/README.md](./meta/README.md) for the met
 Quick version:
 1. Run `./meta/convert-to-meta.sh` (or `.ps1`) to create `.meta_marge/`
 2. Use prompts with "Read the AGENTS.md file in the .meta_marge folder"
-3. Test with `./scripts/test-marge.sh` (or `.ps1`)
-4. Copy changes back when satisfied
+3. AI makes improvements directly to `marge-simpson/` (guided by `.meta_marge/AGENTS.md`)
+4. Test with `./scripts/test-marge.sh` (or `.ps1`)
 
 ---
 
