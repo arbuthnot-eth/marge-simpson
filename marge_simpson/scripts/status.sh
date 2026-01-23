@@ -16,7 +16,6 @@ set -euo pipefail
 # Dynamic folder detection
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MS_DIR="$(cd "$SCRIPTS_DIR/.." && pwd)"
-MS_FOLDER_NAME="$(basename "$MS_DIR")"
 
 # Colors
 RED='\033[0;31m'
@@ -232,8 +231,6 @@ fi
 
 # Knowledge Base
 write_section "KNOWLEDGE BASE"
-
-TOTAL_KNOWLEDGE=$((K_DECISIONS + K_PREFERENCES + K_PATTERNS + K_INSIGHTS))
 
 if [[ $K_DECISIONS -gt 0 ]]; then
     write_row "Decisions" "$K_DECISIONS entries" "$CYAN"
