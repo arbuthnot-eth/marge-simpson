@@ -37,10 +37,10 @@ For users working across multiple repos who want:
 
 ```bash
 # macOS/Linux
-./install-global.sh
+./marge_simpson/scripts/install-global.sh
 
 # Windows
-.\install-global.ps1
+.\marge_simpson\scripts\install-global.ps1
 ```
 
 ---
@@ -471,10 +471,10 @@ Want to improve Marge itself? Use the **meta development workflow**:
 ### Quick Start
 ```powershell
 # Windows
-.\convert-to-meta.ps1
+.\marge_simpson\scripts\convert-to-meta.ps1
 
 # macOS/Linux
-./convert-to-meta.sh
+./marge_simpson/scripts/convert-to-meta.sh
 ```
 
 ### To create a Meta Marge to make Marge better

@@ -27,11 +27,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$SrcDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Src = Join-Path $SrcDir "marge_simpson"
+# Script is in marge_simpson/scripts/, so repo root is two levels up
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RepoRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
+$Src = Join-Path $RepoRoot "marge_simpson"
 
 if (-not (Test-Path $Src)) {
-    Write-Error "marge_simpson/ folder not found in $SrcDir"
+    Write-Error "marge_simpson/ folder not found in $RepoRoot"
     exit 1
 }
 
@@ -88,17 +90,17 @@ foreach ($item in $TemplateItems) {
     }
 }
 
-# Install marge-init script
-Copy-Item -Force (Join-Path $SrcDir "marge-init.ps1") "$InstallDir\marge-init.ps1"
+# Install marge-init script (now in scripts folder)
+Copy-Item -Force (Join-Path $ScriptDir "marge-init.ps1") "$InstallDir\marge-init.ps1"
 
 # Install marge CLI wrapper (bash script - works in WSL/Git Bash)
-$margeCli = Join-Path $SrcDir "marge"
+$margeCli = Join-Path $ScriptDir "marge"
 if (Test-Path $margeCli) {
     Copy-Item -Force $margeCli "$InstallDir\marge"
 }
 
-# Install marge PowerShell CLI
-$margePs1 = Join-Path $Src "scripts\marge.ps1"
+# Install marge PowerShell CLI (now in scripts folder)
+$margePs1 = Join-Path $ScriptDir "marge.ps1"
 if (Test-Path $margePs1) {
     Copy-Item -Force $margePs1 "$InstallDir\marge.ps1"
 }

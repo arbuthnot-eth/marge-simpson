@@ -293,11 +293,12 @@ Want to improve Marge itself? Use the **meta development workflow**:
 
 ### Quick Start
 ```powershell
+# From repo root:
 # Windows
-.\convert-to-meta.ps1
+.\marge_simpson\scripts\convert-to-meta.ps1
 
 # macOS/Linux
-./convert-to-meta.sh
+./marge_simpson/scripts/convert-to-meta.sh
 ```
 
 ### To create a Meta Marge to make Marge better

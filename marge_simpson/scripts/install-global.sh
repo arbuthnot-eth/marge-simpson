@@ -43,11 +43,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC="$SRC_DIR/marge_simpson"
+# Script is in marge_simpson/scripts/, so repo root is two levels up
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+SRC="$REPO_ROOT/marge_simpson"
 
 if [[ ! -d "$SRC" ]]; then
-    echo "Error: marge_simpson/ folder not found in $SRC_DIR" >&2
+    echo "Error: marge_simpson/ folder not found in $REPO_ROOT" >&2
     exit 1
 fi
 
@@ -101,12 +103,12 @@ for item in "${TEMPLATE_FILES[@]}"; do
     fi
 done
 
-# Install marge-init script
-cp "$SRC_DIR/marge-init" "$INSTALL_DIR/marge-init"
+# Install marge-init script (now in scripts folder)
+cp "$SCRIPT_DIR/marge-init" "$INSTALL_DIR/marge-init"
 chmod +x "$INSTALL_DIR/marge-init"
 
-# Install marge CLI wrapper
-cp "$SRC_DIR/marge" "$INSTALL_DIR/marge"
+# Install marge CLI wrapper (now in scripts folder)
+cp "$SCRIPT_DIR/marge" "$INSTALL_DIR/marge"
 chmod +x "$INSTALL_DIR/marge"
 
 # Create convenience symlinks in ~/.local/bin if it exists or can be created

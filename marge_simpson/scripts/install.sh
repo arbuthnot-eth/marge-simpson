@@ -25,8 +25,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC="$SRC_DIR/marge_simpson"
+# Script is in marge_simpson/scripts/, so repo root is two levels up
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+SRC="$REPO_ROOT/marge_simpson"
 
 if [[ ! -d "$SRC" ]]; then
   echo "Could not find source folder: $SRC" >&2

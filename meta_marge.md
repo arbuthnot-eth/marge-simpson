@@ -22,20 +22,20 @@ When you're done improving Marge via meta_marge:
 ### Option 1: Use the Conversion Script (Recommended)
 
 ```powershell
-# Windows PowerShell
-.\convert-to-meta.ps1 -Force
+# Windows PowerShell (from repo root)
+.\marge_simpson\scripts\convert-to-meta.ps1 -Force
 
 # Or with custom names
-.\convert-to-meta.ps1 -SourceName "marge_simpson" -TargetName "my_meta_marge"
+.\marge_simpson\scripts\convert-to-meta.ps1 -SourceName "marge_simpson" -TargetName "my_meta_marge"
 ```
 
 ```bash
-# macOS/Linux
-./convert-to-meta.sh
+# macOS/Linux (from repo root)
+./marge_simpson/scripts/convert-to-meta.sh
 
 # Or with options
-./convert-to-meta.sh -f                    # Force overwrite
-./convert-to-meta.sh -s marge_simpson -t my_meta_marge
+./marge_simpson/scripts/convert-to-meta.sh -f                    # Force overwrite
+./marge_simpson/scripts/convert-to-meta.sh -s marge_simpson -t my_meta_marge
 ```
 
 The script:
@@ -107,7 +107,7 @@ Binary files are skipped.
 
 1. **Create meta_marge:**
    ```powershell
-   .\convert-to-meta.ps1 -Force
+   .\marge_simpson\scripts\convert-to-meta.ps1 -Force
    ```
 
 2. **Work in meta_marge:**
@@ -137,17 +137,17 @@ Binary files are skipped.
 
 ```powershell
 # Basic usage (prompts if meta_marge exists)
-.\convert-to-meta.ps1
+.\marge_simpson\scripts\convert-to-meta.ps1
 
 # Overwrite without prompting
-.\convert-to-meta.ps1 -Force
+.\marge_simpson\scripts\convert-to-meta.ps1 -Force
 
 # Custom folder names
-.\convert-to-meta.ps1 -SourceName "marge_simpson" -TargetName "dev_marge"
+.\marge_simpson\scripts\convert-to-meta.ps1 -SourceName "marge_simpson" -TargetName "dev_marge"
 
 # Create multiple meta instances for parallel development
-.\convert-to-meta.ps1 -TargetName "meta_marge_feature_a"
-.\convert-to-meta.ps1 -TargetName "meta_marge_feature_b"
+.\marge_simpson\scripts\convert-to-meta.ps1 -TargetName "meta_marge_feature_a"
+.\marge_simpson\scripts\convert-to-meta.ps1 -TargetName "meta_marge_feature_b"
 ```
 
 ---

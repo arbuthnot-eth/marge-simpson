@@ -15,7 +15,10 @@ param(
   [switch]$Force
 )
 
-$src = Join-Path $PSScriptRoot "marge_simpson"
+# Script is in marge_simpson/scripts/, so repo root is two levels up
+$ScriptDir = $PSScriptRoot
+$RepoRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
+$src = Join-Path $RepoRoot "marge_simpson"
 if (-not (Test-Path $src)) {
   Write-Error "Could not find source folder: $src"
   exit 1

@@ -247,10 +247,10 @@ if ($bashAvailable) {
             }
         }
         
-        # Also check root-level CLI scripts
-        $rootScripts = @("marge", "marge-init", "install.sh", "install-global.sh", "convert-to-meta.sh")
-        foreach ($script in $rootScripts) {
-            $scriptPath = Join-Path $RepoRoot $script
+        # CLI scripts are now in marge_simpson/scripts/
+        $cliScripts = @("marge", "marge-init", "install.sh", "install-global.sh", "convert-to-meta.sh")
+        foreach ($script in $cliScripts) {
+            $scriptPath = Join-Path $ScriptsDir $script
             if (Test-Path $scriptPath) {
                 Test-Assert "$script passes shellcheck" {
                     $shPath = $scriptPath -replace '\\', '/'

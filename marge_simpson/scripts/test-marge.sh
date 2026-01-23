@@ -82,7 +82,8 @@ if command -v shellcheck &>/dev/null; then
         fi
     done
     # Root-level CLI scripts
-    for script in "$REPO_ROOT/marge" "$REPO_ROOT/marge-init" "$REPO_ROOT/install.sh" "$REPO_ROOT/install-global.sh" "$REPO_ROOT/convert-to-meta.sh"; do
+    # CLI scripts are now in marge_simpson/scripts/
+    for script in "$SCRIPTS_DIR/marge" "$SCRIPTS_DIR/marge-init" "$SCRIPTS_DIR/install.sh" "$SCRIPTS_DIR/install-global.sh" "$SCRIPTS_DIR/convert-to-meta.sh"; do
         if [[ -f "$script" ]]; then
             script_name=$(basename "$script")
             SHELLCHECK_RESULT=$(shellcheck "$script" 2>&1 && echo 0 || echo 1)
