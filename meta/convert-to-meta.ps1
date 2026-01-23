@@ -121,6 +121,9 @@ foreach ($item in $items) {
 $TextExtensions = @('md', 'txt', 'json', 'yml', 'yaml', 'toml', 'ps1', 'sh', 'bash', 'zsh', 'py', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'scss', 'less', 'xml', 'config', 'cfg', 'ini', 'env', 'gitignore', 'dockerignore', 'sql', 'graphql', 'prisma')
 $TextFilenames = @('Makefile', 'Dockerfile', 'Jenkinsfile', 'Procfile', 'LICENSE', 'README', 'CHANGELOG', 'CONTRIBUTING', 'VERSION')
 
+# Names to rewrite inside files (support repo-root runs where SourceName isn't .marge)
+$ContentSourceNames = @($SourceName, '.marge') | Select-Object -Unique
+
 Write-Host "[3/5] Transforming file contents..."
 
 $TransformedCount = 0
@@ -157,23 +160,25 @@ foreach ($file in $files) {
         
         $originalContent = $content
         
-        # Apply replacements
-        $content = $content -replace [regex]::Escape("$SourceName/"), "$TargetName/"
-        $content = $content -replace [regex]::Escape("[$SourceName]"), "[$TargetName]"
-        $content = $content -replace [regex]::Escape("'$SourceName'"), "'$TargetName'"
-        $content = $content -replace [regex]::Escape("`"$SourceName`""), "`"$TargetName`""
-        $content = $content -replace [regex]::Escape("``$SourceName``"), "``$TargetName``"
-        $content = $content -replace " $([regex]::Escape($SourceName)) ", " $TargetName "
-        $content = $content -replace " $([regex]::Escape($SourceName))\.", " $TargetName."
-        $content = $content -replace " $([regex]::Escape($SourceName)),", " ${TargetName},"
-        $content = $content -replace " $([regex]::Escape($SourceName)):", " ${TargetName}:"
-        $content = $content -replace "\($([regex]::Escape($SourceName))\)", "($TargetName)"
-        $content = $content -replace ": $([regex]::Escape($SourceName))", ": $TargetName"
-        $content = $content -replace "# $([regex]::Escape($SourceName))", "# $TargetName"
-        $content = $content -replace "=$([regex]::Escape($SourceName))", "=${TargetName}"
-        
-        # Word boundary replacement
-        $content = $content -replace "(?<![a-zA-Z0-9_])$([regex]::Escape($SourceName))(?![a-zA-Z0-9_])", $TargetName
+        foreach ($name in $ContentSourceNames) {
+            # Apply replacements
+            $content = $content -replace [regex]::Escape("$name/"), "$TargetName/"
+            $content = $content -replace [regex]::Escape("[$name]"), "[$TargetName]"
+            $content = $content -replace [regex]::Escape("'$name'"), "'$TargetName'"
+            $content = $content -replace [regex]::Escape("`"$name`""), "`"$TargetName`""
+            $content = $content -replace [regex]::Escape("``$name``"), "``$TargetName``"
+            $content = $content -replace " $([regex]::Escape($name)) ", " $TargetName "
+            $content = $content -replace " $([regex]::Escape($name))\.", " $TargetName."
+            $content = $content -replace " $([regex]::Escape($name)),", " ${TargetName},"
+            $content = $content -replace " $([regex]::Escape($name)):", " ${TargetName}:"
+            $content = $content -replace "\($([regex]::Escape($name))\)", "($TargetName)"
+            $content = $content -replace ": $([regex]::Escape($name))", ": $TargetName"
+            $content = $content -replace "# $([regex]::Escape($name))", "# $TargetName"
+            $content = $content -replace "=$([regex]::Escape($name))", "=${TargetName}"
+            
+            # Word boundary replacement
+            $content = $content -replace "(?<![a-zA-Z0-9_])$([regex]::Escape($name))(?![a-zA-Z0-9_])", $TargetName
+        }
         
         if ($content -ne $originalContent) {
             Set-Content -Path $file.FullName -Value $content -NoNewline
@@ -290,10 +295,13 @@ $RemainingRefs = 0
 foreach ($file in (Get-ChildItem -Path $TargetFolder -Recurse -File -Force)) {
     try {
         $content = Get-Content -Path $file.FullName -Raw -ErrorAction SilentlyContinue
-        if ($content -match "\b$([regex]::Escape($SourceName))\b") {
-            $relativePath = $file.FullName.Substring($TargetFolder.Length + 1)
-            Write-Host "  Note: '$SourceName' still found in: $relativePath (may be intentional)"
-            $RemainingRefs++
+        foreach ($name in $ContentSourceNames) {
+            if ($content -match "\b$([regex]::Escape($name))\b") {
+                $relativePath = $file.FullName.Substring($TargetFolder.Length + 1)
+                Write-Host "  Note: '$name' still found in: $relativePath (may be intentional)"
+                $RemainingRefs++
+                break
+            }
         }
     } catch {
         # Skip binary files

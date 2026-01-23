@@ -5,6 +5,23 @@ All notable changes to the Marge project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-01-24
+
+### Changed
+- **Folder-agnostic templates** - All prompts and docs now use relative paths ("this folder", "planning_docs/") instead of hardcoded `.marge`
+- **Flexible folder naming** - Users can name their folder anything (`marge/`, `.marge/`, `ai-assistant/`, etc.)
+- **`convert-to-meta` scripts** - Now properly replace both source folder name AND `.marge` references with `.meta_marge`
+
+### Fixed
+- **MS-0001** - `.meta_marge/` was being created with `.marge` paths inside documents instead of `.meta_marge`
+- All prompt_examples/*.md files updated to use relative folder references
+- README.md prompt templates updated to be folder-agnostic
+- workflows/_index.md scope inference updated for folder-agnostic operation
+
+### Documentation
+- Clarified three usage patterns: Direct Copy (any name), Global CLI (`.marge`), Meta-Development (`.meta_marge`)
+- Updated Quick Start to emphasize folder naming flexibility
+
 ## [1.2.1] - 2026-01-23
 
 ### Changed
@@ -68,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.meta_marge/` - Self-development working copy (gitignored)
 - Changes flow: `marge_simpson/` → `.meta_marge/` → validate → back to `marge_simpson/`
 
+[1.2.2]: https://github.com/Soupernerd/marge-simpson/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/Soupernerd/marge-simpson/compare/v1.1.0...v1.2.1
 [1.1.0]: https://github.com/Soupernerd/marge-simpson/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Soupernerd/marge-simpson/releases/tag/v1.0.0

@@ -6,11 +6,11 @@
 set -eo pipefail
 
 # ============================================
-# Marge v1.2.1 - Autonomous AI Coding Loop
+# Marge v1.2.2 - Autonomous AI Coding Loop
 # ============================================
 
 MARGE_HOME="${MARGE_HOME:-$HOME/.marge}"
-VERSION="1.2.1"
+VERSION="1.2.2"
 
 # Defaults
 DRY_RUN=false

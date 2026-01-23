@@ -25,15 +25,15 @@
 
 ### Option A: Drop-in Folder (Simplest)
 
-1. **Clone or copy this repo** into your project as `.marge/` (or any name)
+1. **Clone or copy this repo** into your project (name it anything you want)
 2. Use a [Chat Prompt](#-chat-prompt-templates) from below
 
 ```bash
 # Example: copy into your project
-cp -r marge-simpson .marge
+cp -r marge-simpson my-project/.marge    # or any name you prefer
 ```
 
-> **💡 Using a different folder name?** Replace `.marge` with your folder name in prompts.
+> **💡 Folder name flexibility:** Prompts use relative paths ("this folder"), so any name works. The CLI uses `.marge` by default when globally installed.
 
 ### Option B: CLI (Local)
 
@@ -77,7 +77,7 @@ Add a loop phrase to any prompt and Marge will keep iterating until work is comp
 *Use first, or periodically to refresh the plan.*
 
 ```
-Read the AGENTS.md file in the .marge folder and follow it.
+Read the AGENTS.md file in this folder and follow it.
 
 Run a system-wide audit of this workspace/repo (read-only).
 - Read and understand the architecture and major workflows.
@@ -85,10 +85,10 @@ Run a system-wide audit of this workspace/repo (read-only).
 - Do not break intended functionality.
 
 Update/create tracking docs:
-- .marge/planning_docs/assessment.md (snapshot + findings + new MS issues)
-- .marge/planning_docs/tasklist.md (prioritized tasks with DoD + verification)
+- planning_docs/assessment.md (snapshot + findings + new MS issues)
+- planning_docs/tasklist.md (prioritized tasks with DoD + verification)
 
-After finished above, search for and list remaining unchecked items (if any exist) in .marge/planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
+After finished above, search for and list remaining unchecked items (if any exist) in planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
 
 Output using the Response Format (include IDs created).
 ```
@@ -99,14 +99,14 @@ Output using the Response Format (include IDs created).
 *Report bugs or request features. Each becomes tracked work.*
 
 ```
-Read the AGENTS.md file in the .marge folder and follow it.
+Read the AGENTS.md file in this folder and follow it.
 
 New Feature / Issues:
 - Example Feature: "Lets add a drop down next to search that allows for.."
 - Example / New Issue: "The right hand side nav is not expanding as expected"
 - Example / Existing issue not fixed: "MS-0046 is still exhibiting [insert issue here]"
 
-After finished above, search for and list remaining unchecked items (if any exist) in .marge/planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
+After finished above, search for and list remaining unchecked items (if any exist) in planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
 
 Output using the Response Format (include IDs created).
 ```
@@ -117,13 +117,13 @@ Output using the Response Format (include IDs created).
 *Give direct instructions without needing a feature/issue format.*
 
 ```
-Read the AGENTS.md file in the .marge folder and follow it.
+Read the AGENTS.md file in this folder and follow it.
 
 Instruction:
 - (your instruction here)
 - (another instruction here)
 
-After finished above, search for and list remaining unchecked items (if any exist) in .marge/planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
+After finished above, search for and list remaining unchecked items (if any exist) in planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
 
 Output using the Response Format (include IDs created).
 ```
@@ -134,7 +134,7 @@ Output using the Response Format (include IDs created).
 *Ask questions or confirm fixes. Quick answers grounded in code.*
 
 ```
-Read the AGENTS.md file in the .marge folder and follow it.
+Read the AGENTS.md file in this folder and follow it.
 
 Questions / Confirmations:
 1. (Question/confirmation here)
@@ -142,7 +142,7 @@ Questions / Confirmations:
 3. Example Confirmation: "MS-00xx fixed"
 4. Example Question: "Are there alternatives to codemirror?"
 
-After finished above, search for and list remaining unchecked items (if any exist) in .marge/planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
+After finished above, search for and list remaining unchecked items (if any exist) in planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
 
 Output using the Response Format (include IDs created).
 ```
@@ -153,31 +153,31 @@ Output using the Response Format (include IDs created).
 *Let Marge propose new features based on your codebase.*
 
 ```
-Read and follow the rules in `.marge/AGENTS.md`.
+Read and follow the rules in AGENTS.md (in this folder).
 
 MODE: PLANNING ONLY (no code changes, no patches, no execution).
 
 Goal: Propose new features for this project.
 
 Requirements:
-- Suggest 3–8 viable feature ideas.
-- Rank them highest → lowest by end-user UX / value (UX/value is the primary decision factor).
+- Suggest 3-8 viable feature ideas.
+- Rank them highest to lowest by end-user UX / value (UX/value is the primary decision factor).
 - Do not prioritize "easy to build" unless it also clearly improves UX/value.
-- Do not treat anything as approved—these are proposals only.
+- Do not treat anything as approved - these are proposals only.
 
 For each feature (keep it concise):
 - Name (short)
-- What it does (1–2 sentences)
+- What it does (1-2 sentences)
 - Who it helps / why it matters (1 sentence)
 - Biggest risk or dependency (1 bullet)
 - How you would validate success (1 bullet; user-facing metric or acceptance criteria)
 
 Output format:
 1) Ranked list of features
-2) A short "Top pick summary" (2–4 lines) explaining why the #1–#2 options win on UX/value
+2) A short "Top pick summary" (2-4 lines) explaining why the #1-#2 options win on UX/value
 
 Update/append/create tracking doc:
-- .marge/recommended_features.md (with the bullet points created per feature)
+- recommended_features.md (with the bullet points created per feature)
 
 Minimize follow-up questions. If info is missing, make reasonable assumptions and state them briefly.
 ```
@@ -188,7 +188,7 @@ Minimize follow-up questions. If info is missing, make reasonable assumptions an
 *Mix questions and issues in one prompt for efficiency.*
 
 ```
-Read the AGENTS.md file in the .marge folder and follow it.
+Read the AGENTS.md file in this folder and follow it.
 
 Questions / Confirmations:
 1. (Question/confirmation here)
@@ -202,7 +202,7 @@ New Feature / Issues:
 - (New Feature or Issue here)
 - (New Feature or Issue here)
 
-After finished above, search for and list remaining unchecked items (if any exist) in .marge/planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
+After finished above, search for and list remaining unchecked items (if any exist) in planning_docs/tasklist.md (P0 → P1 → P2). Suggest order of operations.
 
 Output using the Response Format (include IDs created).
 ```
@@ -380,7 +380,7 @@ Want to improve Marge itself? See [meta/README.md](./meta/README.md) for the met
 
 Quick version:
 1. Run `./meta/convert-to-meta.sh` (or `.ps1`) to create `.meta_marge/`
-2. Use prompts referencing `.meta_marge` instead of `.marge`
+2. Use prompts with "Read the AGENTS.md file in the .meta_marge folder"
 3. Test with `./scripts/test-marge.sh` (or `.ps1`)
 4. Copy changes back when satisfied
 

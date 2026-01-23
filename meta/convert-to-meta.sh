@@ -107,6 +107,13 @@ fi
 # Text file extensions to transform
 TEXT_EXTENSIONS="md|txt|json|yml|yaml|toml|ps1|sh|bash|zsh|py|js|ts|jsx|tsx|html|css|scss|less|xml|config|cfg|ini|env|gitignore|dockerignore|sql|graphql|prisma"
 
+# Names to rewrite inside files (support repo-root runs where SOURCE_NAME isn't .marge)
+CONTENT_SOURCE_NAMES=()
+CONTENT_SOURCE_NAMES+=("$SOURCE_NAME")
+if [[ "$SOURCE_NAME" != ".marge" ]]; then
+  CONTENT_SOURCE_NAMES+=(".marge")
+fi
+
 echo "[3/5] Transforming file contents..."
 
 TRANSFORMED_COUNT=0
@@ -144,24 +151,26 @@ while IFS= read -r -d '' file; do
   original_content=$(cat "$file" 2>/dev/null) || continue
   content="$original_content"
 
-  # Apply replacements
-  content=${content//"$SOURCE_NAME/"/"$TARGET_NAME/"}
-  content=${content//"[$SOURCE_NAME]"/"[$TARGET_NAME]"}
-  content=${content//"'$SOURCE_NAME'"/"'$TARGET_NAME'"}
-  content=${content//"\"$SOURCE_NAME\""/"\"$TARGET_NAME\""}
-  content=${content//"\`$SOURCE_NAME\`"/"\`$TARGET_NAME\`"}
-  content=${content//" $SOURCE_NAME "/" $TARGET_NAME "}
-  content=${content//" $SOURCE_NAME."/" $TARGET_NAME."}
-  content=${content//" $SOURCE_NAME,"/" $TARGET_NAME,"}
-  content=${content//" $SOURCE_NAME:"/" $TARGET_NAME:"}
-  content=${content//"($SOURCE_NAME)"/"($TARGET_NAME)"}
-  content=${content//": $SOURCE_NAME"/": $TARGET_NAME"}
-  content=${content//"# $SOURCE_NAME"/"# $TARGET_NAME"}
-  content=${content//"=$SOURCE_NAME"/"=$TARGET_NAME"}
-  
-  # Final word-boundary replacement for any remaining instances
-  # shellcheck disable=SC2001  # sed needed for regex word boundaries
-  content=$(echo "$content" | sed -E "s/(^|[^[:alnum:]_])${SOURCE_NAME}([^[:alnum:]_]|$)/\\1${TARGET_NAME}\\2/g")
+  for name in "${CONTENT_SOURCE_NAMES[@]}"; do
+    # Apply replacements
+    content=${content//"$name/"/"$TARGET_NAME/"}
+    content=${content//"[$name]"/"[$TARGET_NAME]"}
+    content=${content//"'$name'"/"'$TARGET_NAME'"}
+    content=${content//"\"$name\""/"\"$TARGET_NAME\""}
+    content=${content//"\`$name\`"/"\`$TARGET_NAME\`"}
+    content=${content//" $name "/" $TARGET_NAME "}
+    content=${content//" $name."/" $TARGET_NAME."}
+    content=${content//" $name,"/" $TARGET_NAME,"}
+    content=${content//" $name:"/" $TARGET_NAME:"}
+    content=${content//"($name)"/"($TARGET_NAME)"}
+    content=${content//": $name"/": $TARGET_NAME"}
+    content=${content//"# $name"/"# $TARGET_NAME"}
+    content=${content//"=$name"/"=$TARGET_NAME"}
+    
+    # Final word-boundary replacement for any remaining instances
+    # shellcheck disable=SC2001  # sed needed for regex word boundaries
+    content=$(echo "$content" | sed -E "s/(^|[^[:alnum:]_])${name}([^[:alnum:]_]|$)/\\1${TARGET_NAME}\\2/g")
+  done
   
   if [[ "$content" != "$original_content" ]]; then
     echo "$content" > "$file"
@@ -275,11 +284,14 @@ echo "[5/5] Verifying conversion..."
 # Check for any remaining source name references
 REMAINING_REFS=0
 while IFS= read -r -d '' file; do
-  if grep -q "\\b$SOURCE_NAME\\b" "$file" 2>/dev/null; then
-    rel_path="${file#"$TARGET_FOLDER"/}"
-    echo "  Note: '$SOURCE_NAME' still found in: $rel_path (may be intentional)"
-    ((REMAINING_REFS++)) || true
-  fi
+  for name in "${CONTENT_SOURCE_NAMES[@]}"; do
+    if grep -q "\\b${name}\\b" "$file" 2>/dev/null; then
+      rel_path="${file#"$TARGET_FOLDER"/}"
+      echo "  Note: '$name' still found in: $rel_path (may be intentional)"
+      ((REMAINING_REFS++)) || true
+      break
+    fi
+  done
 done < <(find "$TARGET_FOLDER" -type f -print0)
 
 # Run verification if verify script exists

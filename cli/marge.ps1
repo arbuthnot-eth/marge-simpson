@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Marge v1.2.1 - Autonomous AI Coding Loop (PowerShell)
+    Marge v1.2.2 - Autonomous AI Coding Loop (PowerShell)
 
 .DESCRIPTION
     A command-line interface for running AI coding tasks autonomously.
@@ -52,10 +52,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 # ============================================
-# Marge v1.2.1 - Autonomous AI Coding Loop
+# Marge v1.2.2 - Autonomous AI Coding Loop
 # ============================================
 
-$script:VERSION = "1.2.1"
+$script:VERSION = "1.2.2"
 $script:MARGE_HOME = if ($env:MARGE_HOME) { $env:MARGE_HOME } else { "$env:USERPROFILE\.marge" }
 
 # Defaults
