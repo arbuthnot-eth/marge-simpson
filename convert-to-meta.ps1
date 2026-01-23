@@ -148,11 +148,6 @@ foreach ($file in $allFiles) {
     # Determine if this is a text file
     $isTextFile = ($textExtensions -contains $ext) -or ($textFilenames -contains $name) -or ($ext -eq "")
     
-    # Skip binary files and verify_logs
-    if ($file.FullName -like "*\verify_logs\*") {
-        continue
-    }
-    
     # Skip dual-folder documentation files (they intentionally contain both folder names)
     $relPath = $file.FullName.Substring($targetFolder.Length + 1)
     $isDualFolderDoc = $dualFolderDocFiles | Where-Object { $relPath -like "*$_" }
@@ -312,30 +307,14 @@ _None_
     Write-Host "  Reset: tasklist.md" -ForegroundColor Gray
 }
 
-# Reset instructions_log.md
-$instructionsLogPath = Join-Path $targetFolder "instructions_log.md"
-if (Test-Path $instructionsLogPath) {
-    $instructionsLogContent = @"
-# $TargetName Instructions Log
-
-> Log of instructions and decisions during meta-development.
-
----
-
-_No entries yet._
-"@
-    Set-Content -Path $instructionsLogPath -Value $instructionsLogContent
-    Write-Host "  Reset: instructions_log.md" -ForegroundColor Gray
+# Clear plans/ folder (keep .gitkeep and _template.md)
+$plansPath = Join-Path $targetFolder "plans"
+if (Test-Path $plansPath) {
+    Get-ChildItem -Path $plansPath -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '^\.git(ignore|keep)$' -and $_.Name -ne '_template.md' } | Remove-Item -Force
+    Write-Host "  Cleared: plans/ (preserved .gitkeep, _template.md)" -ForegroundColor Gray
 }
 
-# Clear verify_logs (keep .gitignore and .gitkeep)
-$verifyLogsPath = Join-Path $targetFolder "verify_logs"
-if (Test-Path $verifyLogsPath) {
-    Get-ChildItem -Path $verifyLogsPath -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '^\.git(ignore|keep)$' } | Remove-Item -Force
-    Write-Host "  Cleared: verify_logs/ (preserved .gitignore, .gitkeep)" -ForegroundColor Gray
-}
-
-# Transform AGENTS.md for meta_marge (add audit exclusion rule)
+# Transform AGENTS.md for meta_marge (remove conditional clause)
 $agentsPath = Join-Path $targetFolder "AGENTS.md"
 if (Test-Path $agentsPath) {
     $agentsContent = Get-Content -Path $agentsPath -Raw
@@ -347,8 +326,8 @@ if (Test-Path $agentsPath) {
         $agentsContent = $agentsContent.Replace($conditionalPattern, "")
         Set-Content -Path $agentsPath -Value $agentsContent -NoNewline
         Write-Host "  Updated: AGENTS.md (removed conditional clause for meta_marge)" -ForegroundColor Gray
-    } elseif ($agentsContent -match "excluded from audits and issue scans - it is the tooling, not the target\.`n") {
-        Write-Host "  AGENTS.md already has correct audit exclusion rule" -ForegroundColor Gray
+    } elseif ($agentsContent -match "\*\*excluded from audits\*\*.*it is the tooling, not the target\.") {
+        Write-Host "  AGENTS.md has correct audit exclusion rule (no conditional needed for meta_marge)" -ForegroundColor Gray
     } else {
         Write-Host "  WARNING: AGENTS.md has unexpected format - check manually" -ForegroundColor Yellow
     }
@@ -361,8 +340,6 @@ Write-Host "[5/5] Verifying conversion..." -ForegroundColor Green
 $remainingRefs = 0
 $expectedRefs = 0
 foreach ($file in (Get-ChildItem -Path $targetFolder -Recurse -File)) {
-    if ($file.FullName -like "*\verify_logs\*") { continue }
-    
     $relPath = $file.FullName.Substring($targetFolder.Length + 1)
     $isDualFolderDoc = $dualFolderDocFiles | Where-Object { $relPath -like "*$_" }
     

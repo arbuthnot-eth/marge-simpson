@@ -16,7 +16,7 @@ jobs:
       - name: Run Marge Self-Tests (PowerShell)
         shell: pwsh
         run: |
-          powershell -ExecutionPolicy Bypass -File ./marge_simpson/test-marge.ps1
+          powershell -ExecutionPolicy Bypass -File ./marge_simpson/scripts/test-marge.ps1
 
   test-linux:
     name: Test on Linux
@@ -26,12 +26,12 @@ jobs:
       
       - name: Make scripts executable
         run: |
-          chmod +x ./marge_simpson/verify.sh
-          chmod +x ./marge_simpson/cleanup.sh
-          chmod +x ./marge_simpson/test-marge.sh
+          chmod +x ./marge_simpson/scripts/verify.sh
+          chmod +x ./marge_simpson/scripts/cleanup.sh
+          chmod +x ./marge_simpson/scripts/test-marge.sh
       
       - name: Run Marge Self-Tests (Bash)
-        run: ./marge_simpson/test-marge.sh
+        run: ./marge_simpson/scripts/test-marge.sh
 
   test-macos:
     name: Test on macOS
@@ -41,12 +41,12 @@ jobs:
       
       - name: Make scripts executable
         run: |
-          chmod +x ./marge_simpson/verify.sh
-          chmod +x ./marge_simpson/cleanup.sh
-          chmod +x ./marge_simpson/test-marge.sh
+          chmod +x ./marge_simpson/scripts/verify.sh
+          chmod +x ./marge_simpson/scripts/cleanup.sh
+          chmod +x ./marge_simpson/scripts/test-marge.sh
       
       - name: Run Marge Self-Tests (Bash)
-        run: ./marge_simpson/test-marge.sh
+        run: ./marge_simpson/scripts/test-marge.sh
 
   shellcheck:
     name: ShellCheck Lint
@@ -59,8 +59,8 @@ jobs:
       
       - name: Run ShellCheck on shell scripts
         run: |
-          shellcheck ./marge_simpson/verify.sh || true
-          shellcheck ./marge_simpson/cleanup.sh || true
-          shellcheck ./marge_simpson/test-marge.sh || true
+          shellcheck ./marge_simpson/scripts/verify.sh || true
+          shellcheck ./marge_simpson/scripts/cleanup.sh || true
+          shellcheck ./marge_simpson/scripts/test-marge.sh || true
           shellcheck ./install.sh || true
           shellcheck ./convert-to-meta.sh || true

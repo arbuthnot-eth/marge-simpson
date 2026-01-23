@@ -14,6 +14,17 @@ User explicitly asks for:
 
 ## Phase 1: Discovery
 
+### Load Prior Context
+
+Before scanning, check what's already known:
+
+1. **Read `knowledge/_index.md`** — check Quick Stats and Recent Entries
+2. **Grep `knowledge/decisions.md`** for architectural decisions:
+   ```powershell
+   Select-String -Path "marge_simpson/knowledge/decisions.md" -Pattern "#architecture|#database|#api"
+   ```
+3. **Note any constraints** — don't flag issues that contradict known decisions
+
 ### Scan the Codebase
 
 1. Read and understand:

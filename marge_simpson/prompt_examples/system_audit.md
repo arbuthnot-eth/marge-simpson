@@ -8,7 +8,6 @@ Run a system-wide audit of this workspace/repo (read-only).
 Update/create tracking docs:
 - marge_simpson/assessment.md (snapshot + findings + new MS issues)
 - marge_simpson/tasklist.md (prioritized tasks with DoD + verification)
-- skip adding this instruction to marge_simpson/instructions_log.md
 
 After finished above, search for and list remaining unchecked items (if any exist) in marge_simpson/tasklist.md (P0 → P1 → P2). Suggest order of operations.
 

@@ -136,20 +136,11 @@ $MsDir = (Get-Item $ScriptsDir).Parent.FullName
 $MsFolderName = Split-Path $MsDir -Leaf
 $RootDir = (Get-Item $MsDir).Parent.FullName
 $Conf = Join-Path $MsDir "verify.config.json"
-$LogDir = Join-Path $MsDir "verify_logs"
-
-New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
-$Ts = Get-Date -Format "yyyyMMdd_HHmmss"
-$LogFile = Join-Path $LogDir ("verify_{0}_{1}.log" -f $Profile, $Ts)
-
-function Write-Log([string]$Text) {
-  $Text | Tee-Object -FilePath $LogFile -Append
-}
 
 function Run-Cmd([string]$Cmd) {
   $script:CommandsRun++
-  Write-Log ""
-  Write-Log ("==> {0}" -f $Cmd)
+  Write-Host ""
+  Write-Host "==> $Cmd"
   Write-Host "    [>] " -NoNewline -ForegroundColor Cyan
   Write-Host "Running: " -NoNewline -ForegroundColor Gray
   Write-Host $Cmd -ForegroundColor White
@@ -170,8 +161,8 @@ function Run-Cmd([string]$Cmd) {
   $stderr = $p.StandardError.ReadToEnd()
   $p.WaitForExit()
 
-  if ($stdout) { $stdout.TrimEnd() | Tee-Object -FilePath $LogFile -Append }
-  if ($stderr) { $stderr.TrimEnd() | Tee-Object -FilePath $LogFile -Append }
+  if ($stdout) { Write-Host $stdout.TrimEnd() }
+  if ($stderr) { Write-Host $stderr.TrimEnd() }
 
   if ($p.ExitCode -ne 0) {
     $script:CommandsFailed++
@@ -281,11 +272,9 @@ Write-Section "Configuration"
 Write-Info "Folder: $MsFolderName"
 Write-Info "Profile: $Profile"
 Write-Info "Repo Root: $RootDir"
-Write-Info "Log File: $LogFile"
 
-Write-Log ("[{0}] verify profile={1}" -f $MsFolderName, $Profile)
-Write-Log ("[{0}] repo_root={1}" -f $MsFolderName, $RootDir)
-Write-Log ("[{0}] log={1}" -f $MsFolderName, $LogFile)
+Write-Host "[$MsFolderName] verify profile=$Profile"
+Write-Host "[$MsFolderName] repo_root=$RootDir"
 
 $cmds = Read-ConfigCommands
 
@@ -303,17 +292,17 @@ if (-not $cmds -or $cmds.Count -eq 0) {
 
 if (-not $cmds -or $cmds.Count -eq 0) {
   Write-Section "No Tests Found"
-  Write-Log ""
-  Write-Log "No test commands detected."
-  Write-Log ("Create or edit {0} to specify commands for '{1}'." -f $Conf, $Profile)
-  Write-Log 'Example: {"fast": ["npm test"], "full": ["npm ci", "npm test"]}'
+  Write-Host ""
+  Write-Host "No test commands detected."
+  Write-Host ("Create or edit {0} to specify commands for '{1}'." -f $Conf, $Profile)
+  Write-Host 'Example: {"fast": ["npm test"], "full": ["npm ci", "npm test"]}'
   
   Write-Warning "No test commands detected"
   Write-Info "Create or edit verify.config.json to specify commands"
   Write-Info 'Example: {"fast": ["npm test"], "full": ["npm ci", "npm test"]}'
   
   if ($SkipIfNoTests) {
-    Write-Log "[skip] No tests to run (SkipIfNoTests enabled)"
+    Write-Host "[skip] No tests to run (SkipIfNoTests enabled)"
     Write-Warning "Skipping - no tests to run (SkipIfNoTests enabled)"
     Write-FinalSummary -Success $true -FolderName $MsFolderName -ProfileName $Profile
     exit 0
@@ -323,11 +312,11 @@ if (-not $cmds -or $cmds.Count -eq 0) {
 }
 
 Write-Section "Commands Queue ($Profile)"
-Write-Log ""
-Write-Log ("Commands to run ({0}):" -f $Profile)
+Write-Host ""
+Write-Host ("Commands to run ({0}):" -f $Profile)
 $cmdNum = 1
 foreach ($c in $cmds) { 
-  Write-Log ("- {0}" -f $c)
+  Write-Host ("- {0}" -f $c)
   Write-Host "    " -NoNewline
   Write-Host "[$cmdNum]" -NoNewline -ForegroundColor DarkGray
   Write-Host " $c" -ForegroundColor White
@@ -338,15 +327,15 @@ Write-Section "Execution"
 
 try {
   foreach ($c in $cmds) { Run-Cmd $c }
-  Write-Log ""
-  Write-Log ("PASS: [{0}] verify ({1})" -f $MsFolderName, $Profile)
+  Write-Host ""
+  Write-Host ("PASS: [{0}] verify ({1})" -f $MsFolderName, $Profile)
   Write-FinalSummary -Success $true -FolderName $MsFolderName -ProfileName $Profile
   exit 0
 }
 catch {
-  Write-Log ""
-  Write-Log ("FAIL: [{0}] verify ({1})" -f $MsFolderName, $Profile)
-  Write-Log $_
+  Write-Host ""
+  Write-Host ("FAIL: [{0}] verify ({1})" -f $MsFolderName, $Profile)
+  Write-Host $_
   Write-FinalSummary -Success $false -FolderName $MsFolderName -ProfileName $Profile
   exit 1
 }

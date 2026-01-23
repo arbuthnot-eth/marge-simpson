@@ -2,26 +2,19 @@
 <#
 cleanup.ps1 - Marge Simpson Artifact Cleanup
 
-Intelligent cleanup of Marge artifacts. Safe by default: preview mode unless -Confirm is passed.
+Reports on Marge tracking files and suggests archiving when they get large.
 This script auto-detects its own folder name, so you can rename the folder if needed.
 
 CLEANUP RULES:
-1. verify_logs/   - Keep last N logs (default 10) OR logs within M days, whichever is more
-2. assessment.md  - Suggest archiving if large (no auto-modification)
-3. tasklist.md    - Suggest archiving if large (no auto-modification)
-4. instructions_log.md - Never modify (standing instructions are permanent)
+1. assessment.md  - Suggest archiving if large (no auto-modification)
+2. tasklist.md    - Suggest archiving if large (no auto-modification)
 
 Usage:
-  ./cleanup.ps1                    # Preview mode (safe)
-  ./cleanup.ps1 -Confirm           # Actually perform cleanup
-  ./cleanup.ps1 -KeepLogs 20       # Keep more logs
+  ./cleanup.ps1                    # Analyze and report
 #>
 
 param(
-    [int]$KeepLogs = 10,           # Minimum logs to keep regardless of age
-    [int]$ArchiveAfterDays = 7,    # Suggest archiving entries after this many days
-    [switch]$Confirm = $false,     # Must pass to actually delete
-    [switch]$Verbose = $false
+    [int]$ArchiveAfterDays = 7     # Suggest archiving entries after this many days
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,8 +24,6 @@ $scriptsDir = $PSScriptRoot
 $margeDir = (Get-Item $scriptsDir).Parent.FullName
 $msFolderName = Split-Path $margeDir -Leaf
 $repoRoot = (Get-Item $margeDir).Parent.FullName
-$previewMode = -not $Confirm
-$script:StartTime = Get-Date
 
 # ==============================================================================
 # VISUAL HELPERS
@@ -73,61 +64,9 @@ function Write-Success([string]$Text) {
     Write-Host $Text -ForegroundColor Green
 }
 
-function Write-RemoveItem([string]$Text) {
-    Write-Host "    [-] " -NoNewline -ForegroundColor Red
-    Write-Host $Text -ForegroundColor DarkRed
-}
-
 function Write-Suggestion([string]$Text) {
     Write-Host "    [*] " -NoNewline -ForegroundColor Yellow
     Write-Host $Text -ForegroundColor Yellow
-}
-
-function Write-FinalSummary {
-    param(
-        [int]$LogsRemoved,
-        [int]$BytesFreed,
-        [bool]$IsPreview
-    )
-    
-    $elapsed = (Get-Date) - $script:StartTime
-    $duration = "{0:mm}m {0:ss}s" -f $elapsed
-    $freedKB = [math]::Round($BytesFreed / 1024, 1)
-    
-    Write-Host ""
-    Write-Host "  +=========================================================================+" -ForegroundColor Yellow
-    Write-Host "  |                          CLEANUP SUMMARY                                |" -ForegroundColor Yellow
-    Write-Host "  +=========================================================================+" -ForegroundColor Yellow
-    Write-Host "  |                                                                         |" -ForegroundColor Yellow
-    
-    # Stats table
-    $modeText = if ($IsPreview) { "PREVIEW (no changes made)" } else { "APPLIED" }
-    $stats = @(
-        @{ Label = "Mode"; Value = $modeText },
-        @{ Label = "Logs"; Value = "$LogsRemoved $(if ($IsPreview) {'would be '})removed (${freedKB}KB)" },
-        @{ Label = "Duration"; Value = $duration },
-        @{ Label = "Folder"; Value = $msFolderName }
-    )
-    
-    foreach ($stat in $stats) {
-        $line = "   {0,-12} | {1}" -f $stat.Label, $stat.Value
-        Write-Host "  |" -NoNewline -ForegroundColor Yellow
-        Write-Host $line.PadRight(73) -NoNewline -ForegroundColor White
-        Write-Host " |" -ForegroundColor Yellow
-    }
-    
-    Write-Host "  |                                                                         |" -ForegroundColor Yellow
-    
-    if ($IsPreview) {
-        Write-Host "  +---------------------------------------------------------------------------+" -ForegroundColor Yellow
-        Write-Host "  |" -NoNewline -ForegroundColor Yellow
-        Write-Host "   [!] Run with -Confirm to apply these changes                             " -NoNewline -ForegroundColor DarkYellow
-        Write-Host "|" -ForegroundColor Yellow
-        Write-Host "  |                                                                         |" -ForegroundColor Yellow
-    }
-    
-    Write-Host "  +=========================================================================+" -ForegroundColor Yellow
-    Write-Host ""
 }
 
 # ==============================================================================
@@ -136,74 +75,20 @@ function Write-FinalSummary {
 
 Write-Banner
 
+Write-Section "PREVIEW MODE - Analysis Only"
+Write-Info "This script analyzes Marge files and suggests actions"
+Write-Info "No files are modified automatically"
+
 Write-Section "Configuration"
+Write-Info "Folder: $msFolderName"
 Write-Info "Repo Root: $repoRoot"
-Write-Info "Mode: $(if ($previewMode) {'PREVIEW (pass -Confirm to apply)'} else {'APPLYING CHANGES'})"
-Write-Info "Keep Logs: $KeepLogs minimum"
 Write-Info "Archive After: $ArchiveAfterDays days"
 
-$cutoffDate = (Get-Date).AddDays(-$ArchiveAfterDays)
-$changes = @{
-    LogsRemoved     = 0
-    LogsBytesFreed  = 0
-}
-
 # ==============================================================================
-# 1. Clean verify_logs/ - Keep last N OR within M days (whichever keeps more)
+# 1. Report on assessment.md
 # ==============================================================================
 
-Write-Section "Step 1/3: Analyzing verify_logs/"
-
-$logDir = Join-Path $margeDir "verify_logs"
-
-if (Test-Path $logDir) {
-    $allLogs = Get-ChildItem -Path $logDir -Filter "*.log" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending
-    
-    if ($allLogs -and $allLogs.Count -gt $KeepLogs) {
-        # Get logs beyond the minimum keep count
-        $candidatesForRemoval = $allLogs | Select-Object -Skip $KeepLogs
-        
-        # Further filter: only remove if also older than archive window
-        $toRemove = $candidatesForRemoval | Where-Object {
-            $_.LastWriteTime -lt $cutoffDate
-        }
-        
-        foreach ($log in $toRemove) {
-            $changes.LogsBytesFreed += $log.Length
-            $changes.LogsRemoved++
-            
-            if ($Verbose -or $previewMode) {
-                Write-RemoveItem "$($log.Name) - $([math]::Round($log.Length/1024, 1))KB - $($log.LastWriteTime.ToString('yyyy-MM-dd'))"
-            }
-            
-            if (-not $previewMode) {
-                Remove-Item $log.FullName -Force
-            }
-        }
-        
-        Write-Info "Total: $($allLogs.Count) logs, keeping $KeepLogs minimum + any recent"
-        if ($changes.LogsRemoved -gt 0) {
-            Write-Info "Result: $($changes.LogsRemoved) logs $(if ($previewMode) {'would be '})removed"
-        } else {
-            Write-Success "All logs are within retention policy"
-        }
-    }
-    elseif ($allLogs) {
-        Write-Success "Total: $($allLogs.Count) logs (below $KeepLogs threshold, keeping all)"
-    }
-    else {
-        Write-Info "No log files found"
-    }
-}
-else {
-    Write-Info "No verify_logs/ directory found"
-}
-
-# ==============================================================================
-# 2. Report on assessment.md (no auto-modification)
-# ==============================================================================
-
-Write-Section "Step 2/3: Analyzing assessment.md"
+Write-Section "Step 1/2: Analyzing assessment.md"
 
 $assessmentFile = Join-Path $margeDir "assessment.md"
 
@@ -226,10 +111,10 @@ else {
 }
 
 # ==============================================================================
-# 3. Report on tasklist.md (no auto-modification)
+# 2. Report on tasklist.md
 # ==============================================================================
 
-Write-Section "Step 3/3: Analyzing tasklist.md"
+Write-Section "Step 2/2: Analyzing tasklist.md"
 
 $tasklistFile = Join-Path $margeDir "tasklist.md"
 
@@ -252,8 +137,8 @@ else {
     Write-Info "No tasklist.md found"
 }
 
-# ==============================================================================
-# Summary
-# ==============================================================================
-
-Write-FinalSummary -LogsRemoved $changes.LogsRemoved -BytesFreed $changes.LogsBytesFreed -IsPreview $previewMode
+Write-Host ""
+Write-Host "  +=========================================================================+" -ForegroundColor Yellow
+Write-Host "  |                          ANALYSIS COMPLETE                              |" -ForegroundColor Yellow
+Write-Host "  +=========================================================================+" -ForegroundColor Yellow
+Write-Host ""
