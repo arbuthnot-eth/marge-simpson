@@ -113,14 +113,18 @@ done
 if [[ "$UPDATE_GITIGNORE" -eq 1 ]]; then
     if [[ -f ".gitignore" ]]; then
         if ! grep -q "^marge_simpson/$" .gitignore 2>/dev/null; then
-            echo "" >> .gitignore
-            echo "# Marge workflow folder (local tooling)" >> .gitignore
-            echo "marge_simpson/" >> .gitignore
+            {
+                echo ""
+                echo "# Marge workflow folder (local tooling)"
+                echo "marge_simpson/"
+            } >> .gitignore
             echo "Added marge_simpson/ to .gitignore"
         fi
     else
-        echo "# Marge workflow folder (local tooling)" > .gitignore
-        echo "marge_simpson/" >> .gitignore
+        {
+            echo "# Marge workflow folder (local tooling)"
+            echo "marge_simpson/"
+        } > .gitignore
         echo "Created .gitignore with marge_simpson/"
     fi
 fi
