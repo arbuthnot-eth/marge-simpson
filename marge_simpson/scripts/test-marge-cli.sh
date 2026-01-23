@@ -37,6 +37,7 @@ test_fail() {
     TESTS_RUN=$((TESTS_RUN + 1))
 }
 
+# shellcheck disable=SC2317  # Function defined for future use / API completeness
 test_skip() {
     echo -e "${YELLOW}○${NC} $1 (skipped)"
     TESTS_RUN=$((TESTS_RUN + 1))
