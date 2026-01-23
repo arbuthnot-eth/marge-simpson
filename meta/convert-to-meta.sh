@@ -91,17 +91,39 @@ else
   echo "[1/5] Target folder does not exist, will create fresh."
 fi
 
-# Copy folder (excluding .git, node_modules, etc.)
+# Copy folder (excluding .git, node_modules, and files not needed for meta-dev)
 echo "[2/5] Copying $SOURCE_NAME -> $TARGET_NAME..."
 mkdir -p "$TARGET_FOLDER"
 
-# Use rsync if available for better exclusion, otherwise cp
+# Use rsync if available for better exclusion, otherwise cp with cleanup
 if command -v rsync &>/dev/null; then
-  rsync -a --exclude='.git' --exclude='node_modules' --exclude='.meta_marge' --exclude='.marge_meta' --exclude='meta_marge' "$SOURCE_FOLDER/" "$TARGET_FOLDER/"
+  rsync -a \
+    --exclude='.git' \
+    --exclude='node_modules' \
+    --exclude='.meta_marge' \
+    --exclude='.marge_meta' \
+    --exclude='meta_marge' \
+    --exclude='cli' \
+    --exclude='meta' \
+    --exclude='assets' \
+    --exclude='.github' \
+    --exclude='README.md' \
+    --exclude='CHANGELOG.md' \
+    --exclude='VERSION' \
+    --exclude='LICENSE' \
+    --exclude='model_pricing.json' \
+    --exclude='.gitignore' \
+    --exclude='.gitattributes' \
+    "$SOURCE_FOLDER/" "$TARGET_FOLDER/"
 else
   cp -r "$SOURCE_FOLDER/." "$TARGET_FOLDER/"
-  # Remove any nested meta folders that got copied
-  rm -rf "$TARGET_FOLDER/.git" "$TARGET_FOLDER/node_modules" "$TARGET_FOLDER/.meta_marge" "$TARGET_FOLDER/.marge_meta" "$TARGET_FOLDER/meta_marge" 2>/dev/null || true
+  # Remove folders/files not needed for meta-development
+  rm -rf "$TARGET_FOLDER/.git" "$TARGET_FOLDER/node_modules" "$TARGET_FOLDER/.meta_marge" \
+         "$TARGET_FOLDER/.marge_meta" "$TARGET_FOLDER/meta_marge" "$TARGET_FOLDER/cli" \
+         "$TARGET_FOLDER/meta" "$TARGET_FOLDER/assets" "$TARGET_FOLDER/.github" 2>/dev/null || true
+  rm -f "$TARGET_FOLDER/README.md" "$TARGET_FOLDER/CHANGELOG.md" "$TARGET_FOLDER/VERSION" \
+        "$TARGET_FOLDER/LICENSE" "$TARGET_FOLDER/model_pricing.json" \
+        "$TARGET_FOLDER/.gitignore" "$TARGET_FOLDER/.gitattributes" 2>/dev/null || true
 fi
 
 # Text file extensions to transform

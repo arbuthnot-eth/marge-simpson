@@ -23,6 +23,11 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
+# Detect if running in .meta_marge (lightweight mode - fewer required files)
+FOLDER_NAME="$(basename "$REPO_ROOT")"
+IS_META_MARGE=false
+[[ "$FOLDER_NAME" == ".meta_marge" ]] && IS_META_MARGE=true
+
 TOTAL_TESTS=0
 PASSED_TESTS=0
 FAILED_TESTS=0
@@ -103,27 +108,31 @@ else
 fi
 
 # ==============================================================================
-# Test 2: Version Consistency
+# Test 2: Version Consistency (skip for .meta_marge)
 # ==============================================================================
 echo ""
 echo -e "${YELLOW}[2/6] Checking version consistency across files...${NC}"
 
-VERSION_FILE="$REPO_ROOT/VERSION"
-if [[ -f "$VERSION_FILE" ]]; then
-    EXPECTED_VERSION=$(tr -d '[:space:]' < "$VERSION_FILE")
-    test_check "VERSION file exists and is valid" "true"
-    
-    # Check cli/marge
-    if [[ -f "$REPO_ROOT/cli/marge" ]]; then
-        MARGE_VERSION=$(grep -oP 'VERSION="[^"]+"' "$REPO_ROOT/cli/marge" | grep -oP '[\d.]+' | head -1)
-        if [[ "$MARGE_VERSION" == "$EXPECTED_VERSION" ]]; then
-            test_check "cli/marge version matches VERSION file ($EXPECTED_VERSION)" "true"
-        else
-            test_check "cli/marge version matches VERSION file ($EXPECTED_VERSION)" "false" "found $MARGE_VERSION"
-        fi
-    fi
+if [[ "$IS_META_MARGE" == "true" ]]; then
+    echo -e "  ${CYAN}[SKIP] Version tests - not applicable for .meta_marge${NC}"
 else
-    test_check "VERSION file exists and is valid" "false"
+    VERSION_FILE="$REPO_ROOT/VERSION"
+    if [[ -f "$VERSION_FILE" ]]; then
+        EXPECTED_VERSION=$(tr -d '[:space:]' < "$VERSION_FILE")
+        test_check "VERSION file exists and is valid" "true"
+        
+        # Check cli/marge
+        if [[ -f "$REPO_ROOT/cli/marge" ]]; then
+            MARGE_VERSION=$(grep -oP 'VERSION="[^"]+"' "$REPO_ROOT/cli/marge" | grep -oP '[\d.]+' | head -1)
+            if [[ "$MARGE_VERSION" == "$EXPECTED_VERSION" ]]; then
+                test_check "cli/marge version matches VERSION file ($EXPECTED_VERSION)" "true"
+            else
+                test_check "cli/marge version matches VERSION file ($EXPECTED_VERSION)" "false" "found $MARGE_VERSION"
+            fi
+        fi
+    else
+        test_check "VERSION file exists and is valid" "false"
+    fi
 fi
 
 # ==============================================================================
@@ -132,6 +141,7 @@ fi
 echo ""
 echo -e "${YELLOW}[3/6] Checking PS1/SH script parity...${NC}"
 
+# Core script pairs always checked
 script_pairs=(
     "scripts/verify"
     "scripts/cleanup"
@@ -139,9 +149,15 @@ script_pairs=(
     "scripts/status"
     "scripts/test-marge"
     "scripts/test-syntax"
-    "cli/install-global"
-    "meta/convert-to-meta"
 )
+
+# Additional pairs only in full Marge (not .meta_marge)
+if [[ "$IS_META_MARGE" != "true" ]]; then
+    script_pairs+=(
+        "cli/install-global"
+        "meta/convert-to-meta"
+    )
+fi
 
 for base in "${script_pairs[@]}"; do
     base_name=$(basename "$base")
@@ -167,14 +183,10 @@ done
 echo ""
 echo -e "${YELLOW}[4/6] Checking required files exist...${NC}"
 
+# Core files always required
 required_files=(
     "AGENTS.md"
-    "README.md"
-    "CHANGELOG.md"
-    "VERSION"
-    "LICENSE"
     "verify.config.json"
-    "model_pricing.json"
     "workflows/_index.md"
     "workflows/work.md"
     "workflows/audit.md"
@@ -187,11 +199,22 @@ required_files=(
     "scripts/_index.md"
     "planning_docs/assessment.md"
     "planning_docs/tasklist.md"
-    "cli/marge"
-    "cli/marge.ps1"
-    "cli/marge-init"
-    "cli/marge-init.ps1"
 )
+
+# Additional files only required in full Marge (not .meta_marge)
+if [[ "$IS_META_MARGE" != "true" ]]; then
+    required_files+=(
+        "README.md"
+        "CHANGELOG.md"
+        "VERSION"
+        "LICENSE"
+        "model_pricing.json"
+        "cli/marge"
+        "cli/marge.ps1"
+        "cli/marge-init"
+        "cli/marge-init.ps1"
+    )
+fi
 
 for file in "${required_files[@]}"; do
     if [[ -f "$REPO_ROOT/$file" ]]; then
@@ -202,37 +225,41 @@ for file in "${required_files[@]}"; do
 done
 
 # ==============================================================================
-# Test 5: README Documentation Consistency
+# Test 5: README Documentation Consistency (skip for .meta_marge)
 # ==============================================================================
 echo ""
 echo -e "${YELLOW}[5/6] Checking README references match actual files...${NC}"
 
-README_PATH="$REPO_ROOT/README.md"
+if [[ "$IS_META_MARGE" == "true" ]]; then
+    echo -e "  ${CYAN}[SKIP] README tests - not applicable for .meta_marge${NC}"
+else
+    README_PATH="$REPO_ROOT/README.md"
 
-# Check documented folders exist
-documented_folders=("cli" "scripts" "workflows" "experts" "knowledge" "planning_docs" "prompt_examples" "meta")
-for folder in "${documented_folders[@]}"; do
-    if [[ -d "$REPO_ROOT/$folder" ]]; then
-        test_check "Documented folder exists: $folder/" "true"
-    else
-        test_check "Documented folder exists: $folder/" "false"
-    fi
-done
+    # Check documented folders exist
+    documented_folders=("cli" "scripts" "workflows" "experts" "knowledge" "planning_docs" "prompt_examples" "meta")
+    for folder in "${documented_folders[@]}"; do
+        if [[ -d "$REPO_ROOT/$folder" ]]; then
+            test_check "Documented folder exists: $folder/" "true"
+        else
+            test_check "Documented folder exists: $folder/" "false"
+        fi
+    done
 
-# Check CLI flags are documented and implemented
-MARGE_PATH="$REPO_ROOT/cli/marge"
-documented_flags=("--folder" "--dry-run" "--model" "--loop" "--engine" "--parallel" "--branch-per-task" "--create-pr" "--verbose")
+    # Check CLI flags are documented and implemented
+    MARGE_PATH="$REPO_ROOT/cli/marge"
+    documented_flags=("--folder" "--dry-run" "--model" "--loop" "--engine" "--parallel" "--branch-per-task" "--create-pr" "--verbose")
 
-for flag in "${documented_flags[@]}"; do
-    in_readme=$(grep -q -- "$flag" "$README_PATH" 2>/dev/null && echo "true" || echo "false")
-    in_marge=$(grep -q -- "$flag" "$MARGE_PATH" 2>/dev/null && echo "true" || echo "false")
-    
-    if [[ "$in_readme" == "true" ]] && [[ "$in_marge" == "true" ]]; then
-        test_check "CLI flag documented and implemented: $flag" "true"
-    else
-        test_check "CLI flag documented and implemented: $flag" "false" "readme=$in_readme, marge=$in_marge"
-    fi
-done
+    for flag in "${documented_flags[@]}"; do
+        in_readme=$(grep -q -- "$flag" "$README_PATH" 2>/dev/null && echo "true" || echo "false")
+        in_marge=$(grep -q -- "$flag" "$MARGE_PATH" 2>/dev/null && echo "true" || echo "false")
+        
+        if [[ "$in_readme" == "true" ]] && [[ "$in_marge" == "true" ]]; then
+            test_check "CLI flag documented and implemented: $flag" "true"
+        else
+            test_check "CLI flag documented and implemented: $flag" "false" "readme=$in_readme, marge=$in_marge"
+        fi
+    done
+fi
 
 # ==============================================================================
 # Test 6: Workflow Connectivity

@@ -22,6 +22,10 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
 
+# Detect if running in .meta_marge (lightweight mode - fewer required files)
+$FolderName = Split-Path -Leaf $RepoRoot
+$IsMetaMarge = $FolderName -eq ".meta_marge"
+
 $TotalTests = 0
 $PassedTests = 0
 $FailedTests = 0
@@ -115,32 +119,36 @@ Test-Check "No UTF-8 BOM in shell scripts" {
 } -FailureDetail ($bomIssues -join "; ")
 
 # ==============================================================================
-# Test 2: Version Consistency
+# Test 2: Version Consistency (skip for .meta_marge)
 # ==============================================================================
 Write-Host ""
 Write-Host "[2/6] Checking version consistency across files..." -ForegroundColor Yellow
 
-$versionFile = Join-Path $RepoRoot "VERSION"
-$expectedVersion = (Get-Content $versionFile -Raw).Trim()
+if ($IsMetaMarge) {
+    Write-Host "  [SKIP] Version tests - not applicable for .meta_marge" -ForegroundColor Cyan
+} else {
+    $versionFile = Join-Path $RepoRoot "VERSION"
+    $expectedVersion = (Get-Content $versionFile -Raw).Trim()
 
-$versionFiles = @(
-    @{ Path = "cli\marge"; Pattern = 'VERSION="([^"]+)"' },
-    @{ Path = "cli\marge.ps1"; Pattern = '\$script:VERSION\s*=\s*"([^"]+)"' }
-)
+    $versionFiles = @(
+        @{ Path = "cli\marge"; Pattern = 'VERSION="([^"]+)"' },
+        @{ Path = "cli\marge.ps1"; Pattern = '\$script:VERSION\s*=\s*"([^"]+)"' }
+    )
 
-Test-Check "VERSION file exists and is valid" {
-    (Test-Path $versionFile) -and ($expectedVersion -match '^\d+\.\d+\.\d+')
-}
+    Test-Check "VERSION file exists and is valid" {
+        (Test-Path $versionFile) -and ($expectedVersion -match '^\d+\.\d+\.\d+')
+    }
 
-foreach ($vf in $versionFiles) {
-    $filePath = Join-Path $RepoRoot $vf.Path
-    if (Test-Path $filePath) {
-        $content = Get-Content $filePath -Raw
-        if ($content -match $vf.Pattern) {
-            $fileVersion = $Matches[1]
-            Test-Check "$($vf.Path) version matches VERSION file ($expectedVersion)" {
-                $fileVersion -eq $expectedVersion
-            } -FailureDetail "found $fileVersion"
+    foreach ($vf in $versionFiles) {
+        $filePath = Join-Path $RepoRoot $vf.Path
+        if (Test-Path $filePath) {
+            $content = Get-Content $filePath -Raw
+            if ($content -match $vf.Pattern) {
+                $fileVersion = $Matches[1]
+                Test-Check "$($vf.Path) version matches VERSION file ($expectedVersion)" {
+                    $fileVersion -eq $expectedVersion
+                } -FailureDetail "found $fileVersion"
+            }
         }
     }
 }
@@ -151,16 +159,23 @@ foreach ($vf in $versionFiles) {
 Write-Host ""
 Write-Host "[3/6] Checking PS1/SH script parity..." -ForegroundColor Yellow
 
+# Core script pairs always checked
 $scriptPairs = @(
     @{ Base = "scripts\verify"; Extensions = @(".ps1", ".sh") },
     @{ Base = "scripts\cleanup"; Extensions = @(".ps1", ".sh") },
     @{ Base = "scripts\decay"; Extensions = @(".ps1", ".sh") },
     @{ Base = "scripts\status"; Extensions = @(".ps1", ".sh") },
     @{ Base = "scripts\test-marge"; Extensions = @(".ps1", ".sh") },
-    @{ Base = "scripts\test-syntax"; Extensions = @(".ps1", ".sh") },
-    @{ Base = "cli\install-global"; Extensions = @(".ps1", ".sh") },
-    @{ Base = "meta\convert-to-meta"; Extensions = @(".ps1", ".sh") }
+    @{ Base = "scripts\test-syntax"; Extensions = @(".ps1", ".sh") }
 )
+
+# Additional pairs only in full Marge (not .meta_marge)
+if (-not $IsMetaMarge) {
+    $scriptPairs += @(
+        @{ Base = "cli\install-global"; Extensions = @(".ps1", ".sh") },
+        @{ Base = "meta\convert-to-meta"; Extensions = @(".ps1", ".sh") }
+    )
+}
 
 foreach ($pair in $scriptPairs) {
     $baseName = Split-Path -Leaf $pair.Base
@@ -186,14 +201,10 @@ foreach ($pair in $scriptPairs) {
 Write-Host ""
 Write-Host "[4/6] Checking required files exist..." -ForegroundColor Yellow
 
+# Core files always required
 $requiredFiles = @(
     "AGENTS.md",
-    "README.md",
-    "CHANGELOG.md",
-    "VERSION",
-    "LICENSE",
     "verify.config.json",
-    "model_pricing.json",
     "workflows\_index.md",
     "workflows\work.md",
     "workflows\audit.md",
@@ -205,12 +216,23 @@ $requiredFiles = @(
     "knowledge\_index.md",
     "scripts\_index.md",
     "planning_docs\assessment.md",
-    "planning_docs\tasklist.md",
-    "cli\marge",
-    "cli\marge.ps1",
-    "cli\marge-init",
-    "cli\marge-init.ps1"
+    "planning_docs\tasklist.md"
 )
+
+# Additional files only required in full Marge (not .meta_marge)
+if (-not $IsMetaMarge) {
+    $requiredFiles += @(
+        "README.md",
+        "CHANGELOG.md",
+        "VERSION",
+        "LICENSE",
+        "model_pricing.json",
+        "cli\marge",
+        "cli\marge.ps1",
+        "cli\marge-init",
+        "cli\marge-init.ps1"
+    )
+}
 
 foreach ($file in $requiredFiles) {
     $fullPath = Join-Path $RepoRoot $file
@@ -220,31 +242,36 @@ foreach ($file in $requiredFiles) {
 }
 
 # ==============================================================================
-# Test 5: README Documentation Consistency
+# Test 5: README Documentation Consistency (skip for .meta_marge)
 # ==============================================================================
 Write-Host ""
 Write-Host "[5/6] Checking README references match actual files..." -ForegroundColor Yellow
 
 $readmePath = Join-Path $RepoRoot "README.md"
-$readmeContent = Get-Content $readmePath -Raw
 
-# Check that documented folders exist
-$documentedFolders = @("cli/", "scripts/", "workflows/", "experts/", "knowledge/", "planning_docs/", "prompt_examples/", "meta/")
-foreach ($folder in $documentedFolders) {
-    $folderPath = Join-Path $RepoRoot ($folder.TrimEnd('/'))
-    Test-Check "Documented folder exists: $folder" {
-        Test-Path $folderPath -PathType Container
+if ($IsMetaMarge) {
+    Write-Host "  [SKIP] README tests - not applicable for .meta_marge" -ForegroundColor Cyan
+} else {
+    $readmeContent = Get-Content $readmePath -Raw
+
+    # Check that documented folders exist
+    $documentedFolders = @("cli/", "scripts/", "workflows/", "experts/", "knowledge/", "planning_docs/", "prompt_examples/", "meta/")
+    foreach ($folder in $documentedFolders) {
+        $folderPath = Join-Path $RepoRoot ($folder.TrimEnd('/'))
+        Test-Check "Documented folder exists: $folder" {
+            Test-Path $folderPath -PathType Container
+        }
     }
-}
 
-# Check that documented CLI commands reference actual flags in marge script
-$margePath = Join-Path $RepoRoot "cli\marge"
-$margeContent = Get-Content $margePath -Raw
+    # Check that documented CLI commands reference actual flags in marge script
+    $margePath = Join-Path $RepoRoot "cli\marge"
+    $margeContent = Get-Content $margePath -Raw
 
-$documentedFlags = @("--folder", "--dry-run", "--model", "--loop", "--engine", "--parallel", "--branch-per-task", "--create-pr", "--verbose")
-foreach ($flag in $documentedFlags) {
-    Test-Check "CLI flag documented and implemented: $flag" {
-        ($readmeContent -match [regex]::Escape($flag)) -and ($margeContent -match [regex]::Escape($flag))
+    $documentedFlags = @("--folder", "--dry-run", "--model", "--loop", "--engine", "--parallel", "--branch-per-task", "--create-pr", "--verbose")
+    foreach ($flag in $documentedFlags) {
+        Test-Check "CLI flag documented and implemented: $flag" {
+            ($readmeContent -match [regex]::Escape($flag)) -and ($margeContent -match [regex]::Escape($flag))
+        }
     }
 }
 

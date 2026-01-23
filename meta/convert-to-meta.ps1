@@ -82,17 +82,29 @@ if (Test-Path $TargetFolder) {
     Write-Host "[1/5] Target folder does not exist, will create fresh."
 }
 
-# Copy folder (excluding .git, node_modules, etc.)
+# Copy folder (excluding .git, node_modules, and files not needed for meta-dev)
 Write-Host "[2/5] Copying $SourceName -> $TargetName..."
 
-# Get all items excluding certain folders
-$excludeDirs = @('.git', 'node_modules', '.meta_marge', '.marge_meta', 'meta_marge')
+# Folders to exclude entirely
+$excludeDirs = @('.git', 'node_modules', '.meta_marge', '.marge_meta', 'meta_marge', 'cli', 'meta', 'assets', '.github')
+
+# Files to exclude (not needed for meta-development)
+$excludeFiles = @('README.md', 'CHANGELOG.md', 'VERSION', 'LICENSE', 'model_pricing.json', '.gitignore', '.gitattributes')
+
 $items = Get-ChildItem -Path $SourceFolder -Recurse -Force | Where-Object {
     $exclude = $false
+    # Check directory exclusions
     foreach ($dir in $excludeDirs) {
         if ($_.FullName -like "*\$dir\*" -or $_.FullName -like "*\$dir") {
             $exclude = $true
             break
+        }
+    }
+    # Check file exclusions (only at root level)
+    if (-not $exclude -and -not $_.PSIsContainer) {
+        $relativePath = $_.FullName.Substring($SourceFolder.Length + 1)
+        if ($relativePath -in $excludeFiles) {
+            $exclude = $true
         }
     }
     -not $exclude

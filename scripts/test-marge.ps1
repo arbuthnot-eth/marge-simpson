@@ -173,6 +173,9 @@ function Test-BashAvailable {
 
 Write-Banner
 
+# Detect if running in .meta_marge (lightweight mode)
+$IsMetaMarge = $MsFolderName -eq ".meta_marge"
+
 # Test 1: Required files exist
 Write-Section "Test Suite 1/5: File Existence"
 Test-Assert "AGENTS.md exists" { Test-Path (Join-Path $MsDir "AGENTS.md") }
@@ -181,7 +184,9 @@ Test-Assert "verify.sh exists" { Test-Path (Join-Path $ScriptsDir "verify.sh") }
 Test-Assert "cleanup.ps1 exists" { Test-Path (Join-Path $ScriptsDir "cleanup.ps1") }
 Test-Assert "cleanup.sh exists" { Test-Path (Join-Path $ScriptsDir "cleanup.sh") }
 Test-Assert "verify.config.json exists" { Test-Path (Join-Path $MsDir "verify.config.json") }
-Test-Assert "README.md exists" { Test-Path (Join-Path $MsDir "README.md") }
+if (-not $IsMetaMarge) {
+    Test-Assert "README.md exists" { Test-Path (Join-Path $MsDir "README.md") }
+}
 
 # Test 2: Script syntax validation
 Write-Section "Test Suite 2/5: Script Syntax Validation"

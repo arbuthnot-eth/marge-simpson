@@ -18,6 +18,10 @@ MS_DIR="$(cd "$SCRIPTS_DIR/.." && pwd)"
 MS_FOLDER_NAME="$(basename "$MS_DIR")"
 REPO_ROOT="$(cd "$MS_DIR/.." && pwd)"
 
+# Detect if running in .meta_marge (lightweight mode)
+IS_META_MARGE=false
+[[ "$MS_FOLDER_NAME" == ".meta_marge" ]] && IS_META_MARGE=true
+
 TESTS_PASSED=0
 TESTS_FAILED=0
 
@@ -56,7 +60,9 @@ test_assert "verify.sh exists" "$([[ -f "$SCRIPTS_DIR/verify.sh" ]] && echo 0 ||
 test_assert "cleanup.ps1 exists" "$([[ -f "$SCRIPTS_DIR/cleanup.ps1" ]] && echo 0 || echo 1)" || true
 test_assert "cleanup.sh exists" "$([[ -f "$SCRIPTS_DIR/cleanup.sh" ]] && echo 0 || echo 1)" || true
 test_assert "verify.config.json exists" "$([[ -f "$MS_DIR/verify.config.json" ]] && echo 0 || echo 1)" || true
-test_assert "README.md exists" "$([[ -f "$MS_DIR/README.md" ]] && echo 0 || echo 1)" || true
+if [[ "$IS_META_MARGE" != "true" ]]; then
+    test_assert "README.md exists" "$([[ -f "$MS_DIR/README.md" ]] && echo 0 || echo 1)" || true
+fi
 echo ""
 
 # Test 2: Script syntax validation
