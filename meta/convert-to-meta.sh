@@ -330,12 +330,30 @@ fi
 # Rewrite the AGENTS.md Scope section for meta-development
 AGENTS_PATH="$TARGET_FOLDER/AGENTS.md"
 if [[ -f "$AGENTS_PATH" ]]; then
-  # Create the new scope section for .meta_marge
+  # Create the new scope section for .meta_marge with clear workflow
   NEW_SCOPE="**Scope (CRITICAL):**
-1. The \`$TARGET_NAME/\` folder is **excluded from audits** -- it is the tooling, not the target, and exists to update Marge.
-2. Audit the workspace/repo OUTSIDE this folder. Track findings HERE in \`$TARGET_NAME/planning_docs/\` assessment.md and tasklist.md.
-3. Never create \`$TARGET_NAME\` files outside this folder.
-4. **Architecture updates:** When adding/removing files or changing structure, update \`meta/ARCHITECTURE.md\` in the source repo."
+1. The \`$TARGET_NAME/\` folder is **excluded from audits** -- it is the tooling, not the target.
+2. Audit the workspace/repo OUTSIDE this folder (e.g., \`marge-simpson/\`).
+3. Track findings HERE in \`$TARGET_NAME/planning_docs/\` assessment.md and tasklist.md.
+4. Never create \`$TARGET_NAME\` files outside this folder.
+
+**Meta-Development Workflow:**
+\`\`\`
+┌─────────────────────────────────────────────────────────────────┐
+│  .meta_marge/AGENTS.md    ← You are here (the guide)            │
+│         ↓                                                       │
+│  AI audits marge-simpson/ ← The target of improvements          │
+│         ↓                                                       │
+│  Changes made DIRECTLY to marge-simpson/                        │
+│         ↓                                                       │
+│  Work tracked in .meta_marge/planning_docs/                     │
+│         ↓                                                       │
+│  When done: run convert-to-meta again to reset .meta_marge/     │
+└─────────────────────────────────────────────────────────────────┘
+\`\`\`
+
+**IMPORTANT:** \`.meta_marge/\` is the control plane, NOT a sandbox.
+Changes go directly to the source repo. See \`meta/README.md\` for details."
 
   # Read the file, replace the scope section, write back
   # Using awk for multi-line replacement
@@ -381,8 +399,14 @@ if [[ -x "$VERIFY_SCRIPT" ]]; then
     echo " SUCCESS: $TARGET_NAME created and verified!"
     echo "============================================================"
     echo ""
-    echo "You can now use $TARGET_NAME for meta-development."
-    echo "The .meta_marge/AGENTS.md will guide improvements directly to $SOURCE_NAME."
+    echo "META-DEVELOPMENT WORKFLOW:"
+    echo "  1. AI reads .meta_marge/AGENTS.md (the guide)"
+    echo "  2. AI audits and improves $SOURCE_NAME/ (the target)"
+    echo "  3. Work tracked in .meta_marge/planning_docs/"
+    echo "  4. When done: run this script again to reset .meta_marge/"
+    echo ""
+    echo "IMPORTANT: Changes go directly to $SOURCE_NAME/, NOT .meta_marge/"
+    echo "           .meta_marge/ is the control plane, not a sandbox."
   else
     echo ""
     echo "============================================================"
@@ -396,6 +420,14 @@ else
   echo "============================================================"
   echo " DONE: $TARGET_NAME created"
   echo "============================================================"
+  echo ""
+  echo "META-DEVELOPMENT WORKFLOW:"
+  echo "  1. AI reads .meta_marge/AGENTS.md (the guide)"
+  echo "  2. AI audits and improves $SOURCE_NAME/ (the target)"
+  echo "  3. Work tracked in .meta_marge/planning_docs/"
+  echo "  4. When done: run this script again to reset .meta_marge/"
+  echo ""
+  echo "IMPORTANT: Changes go directly to $SOURCE_NAME/, NOT .meta_marge/"
   echo ""
   echo "Run: $TARGET_NAME/scripts/verify.sh fast"
   exit 0

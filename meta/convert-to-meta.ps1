@@ -339,13 +339,31 @@ $AgentsPath = Join-Path $TargetFolder "AGENTS.md"
 if (Test-Path $AgentsPath) {
     $agentsContent = Get-Content -Path $AgentsPath -Raw
     
-    # Define the new scope section for .meta_marge
+    # Define the new scope section for .meta_marge with clear workflow
     $newScope = @"
 **Scope (CRITICAL):**
-1. The ``$TargetName/`` folder is **excluded from audits** -- it is the tooling, not the target, and exists to update Marge.
-2. Audit the workspace/repo OUTSIDE this folder. Track findings HERE in ``$TargetName/planning_docs/`` assessment.md and tasklist.md.
-3. Never create ``$TargetName`` files outside this folder.
-4. **Architecture updates:** When adding/removing files or changing structure, update ``meta/ARCHITECTURE.md`` in the source repo.
+1. The ``$TargetName/`` folder is **excluded from audits** -- it is the tooling, not the target.
+2. Audit the workspace/repo OUTSIDE this folder (e.g., ``marge-simpson/``).
+3. Track findings HERE in ``$TargetName/planning_docs/`` assessment.md and tasklist.md.
+4. Never create ``$TargetName`` files outside this folder.
+
+**Meta-Development Workflow:**
+``````
+┌─────────────────────────────────────────────────────────────────┐
+│  .meta_marge/AGENTS.md    ← You are here (the guide)            │
+│         ↓                                                       │
+│  AI audits marge-simpson/ ← The target of improvements          │
+│         ↓                                                       │
+│  Changes made DIRECTLY to marge-simpson/                        │
+│         ↓                                                       │
+│  Work tracked in .meta_marge/planning_docs/                     │
+│         ↓                                                       │
+│  When done: run convert-to-meta again to reset .meta_marge/     │
+└─────────────────────────────────────────────────────────────────┘
+``````
+
+**IMPORTANT:** ``.meta_marge/`` is the control plane, NOT a sandbox.
+Changes go directly to the source repo. See ``meta/README.md`` for details.
 "@
     
     # Replace the entire Scope section (matches from **Scope to the line before ---)
@@ -393,8 +411,14 @@ if (Test-Path $VerifyScript) {
         Write-Host " SUCCESS: $TargetName created and verified!" -ForegroundColor Green
         Write-Host "============================================================" -ForegroundColor Green
         Write-Host ""
-        Write-Host "You can now use $TargetName for meta-development."
-        Write-Host "The .meta_marge/AGENTS.md will guide improvements directly to $SourceName."
+        Write-Host "META-DEVELOPMENT WORKFLOW:" -ForegroundColor Cyan
+        Write-Host "  1. AI reads .meta_marge/AGENTS.md (the guide)"
+        Write-Host "  2. AI audits and improves $SourceName/ (the target)"
+        Write-Host "  3. Work tracked in .meta_marge/planning_docs/"
+        Write-Host "  4. When done: run this script again to reset .meta_marge/"
+        Write-Host ""
+        Write-Host "IMPORTANT: Changes go directly to $SourceName/, NOT .meta_marge/" -ForegroundColor Yellow
+        Write-Host "           .meta_marge/ is the control plane, not a sandbox." -ForegroundColor Yellow
     } else {
         Write-Host ""
         Write-Host "============================================================" -ForegroundColor Yellow
@@ -408,6 +432,14 @@ if (Test-Path $VerifyScript) {
     Write-Host "============================================================" -ForegroundColor Green
     Write-Host " DONE: $TargetName created" -ForegroundColor Green
     Write-Host "============================================================" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "META-DEVELOPMENT WORKFLOW:" -ForegroundColor Cyan
+    Write-Host "  1. AI reads .meta_marge/AGENTS.md (the guide)"
+    Write-Host "  2. AI audits and improves $SourceName/ (the target)"
+    Write-Host "  3. Work tracked in .meta_marge/planning_docs/"
+    Write-Host "  4. When done: run this script again to reset .meta_marge/"
+    Write-Host ""
+    Write-Host "IMPORTANT: Changes go directly to $SourceName/, NOT .meta_marge/" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Run: $TargetName\scripts\verify.ps1 fast"
     exit 0
