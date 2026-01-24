@@ -1,27 +1,70 @@
-﻿Read and follow the rules in AGENTS.md (in this folder).
+﻿# Feature Proposal Prompt
 
-MODE: PLANNING ONLY (no code changes, no patches, no execution).
+Read and follow the rules in AGENTS.md.
 
-Goal: Propose new features for this project.
+**MODE:** PLANNING ONLY — no code changes, no patches, no execution.
 
-Requirements:
-- Suggest 3-8 viable feature ideas.
-- Rank them highest to lowest by end-user UX / value (UX/value is the primary decision factor).
-- Do not prioritize "easy to build" unless it also clearly improves UX/value.
-- Do not treat anything as approved - these are proposals only.
+---
 
-For each feature (keep it concise):
-- Name (short)
-- What it does (1-2 sentences)
-- Who it helps / why it matters (1 sentence)
-- Biggest risk or dependency (1 bullet)
-- How you would validate success (1 bullet; user-facing metric or acceptance criteria)
+## Goal
 
-Output format:
-1) Ranked list of features
-2) A short "Top pick summary" (2-4 lines) explaining why the #1-#2 options win on UX/value
+Propose 3-8 new features for this project (marge-simpson assistant framework).
 
-Update/append/create tracking doc:
-- recommended_features.md (with the bullet points created per feature)
+---
 
-Minimize follow-up questions. If info is missing, make reasonable assumptions and state them briefly.
+## Context Gathering (do this first)
+
+1. Read `README.md`, `ARCHITECTURE.md`, and `workflows/_index.md` to understand the project's purpose
+2. Skim existing `planning_docs/` to avoid duplicating planned work
+3. Consider gaps in current workflows, CLI, or documentation
+
+---
+
+## Requirements
+
+| Rule | Detail |
+|------|--------|
+| Ranking criterion | **End-user UX / value** (primary). Ease-of-build is secondary. |
+| Status | Proposals only — nothing is approved yet |
+| Scope | Features should be achievable within this repo (no external service dependencies unless clearly justified) |
+
+---
+
+## For Each Feature (keep concise)
+
+```
+### [Rank]. Feature Name
+**What:** 1-2 sentence description of the feature
+**Who/Why:** Who benefits and why it matters (1 sentence)
+**Risk:** Biggest blocker, dependency, or uncertainty (1 bullet)
+**Success metric:** How you'd validate it worked (user-facing outcome or acceptance criteria)
+```
+
+---
+
+## Output Format
+
+1. **Ranked feature list** (highest UX/value → lowest)
+2. **Top pick summary** (3-4 lines): Why #1 and #2 win on UX/value
+3. **Assumptions made** (if any)
+
+---
+
+## Deliverable
+
+Create or update: `planning_docs/recommended_features.md`
+
+Include:
+- Date generated
+- The ranked feature list (full details)
+- Top pick summary
+- Note that these are **proposals pending review**
+
+---
+
+## Constraints
+
+- Do NOT implement anything
+- Do NOT create MS-#### task IDs (these are pre-approval ideas)
+- Minimize follow-up questions — make reasonable assumptions and state them briefly
+- If a feature overlaps with something in `tasklist.md`, note the overlap rather than re-proposing

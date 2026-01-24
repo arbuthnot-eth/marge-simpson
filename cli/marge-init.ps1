@@ -103,6 +103,7 @@ New-Item -ItemType Directory -Force -Path "$TargetDir" | Out-Null
 # Note: Creating symlinks on Windows may require admin privileges or Developer Mode
 $SharedLinks = @(
     "AGENTS.md",
+    "AGENTS-lite.md",
     "assets",
     "experts",
     "knowledge",

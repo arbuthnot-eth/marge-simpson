@@ -76,6 +76,7 @@ mkdir -p "$TARGET_DIR"
 # Symlink shared resources
 SHARED_LINKS=(
     "AGENTS.md"
+    "AGENTS-lite.md"
     "assets"
     "experts"
     "knowledge"

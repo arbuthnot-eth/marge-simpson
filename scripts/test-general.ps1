@@ -273,6 +273,28 @@ if ($IsMetaMarge) {
             ($readmeContent -match [regex]::Escape($flag)) -and ($margeContent -match [regex]::Escape($flag))
         }
     }
+
+    # Check README does not have outdated version numbers
+    # (If README mentions a version, it should match VERSION file)
+    $versionFromFile = (Get-Content (Join-Path $RepoRoot "VERSION") -Raw).Trim()
+    $versionMismatch = $false
+    # Look for version patterns like "v1.2.3" or "1.2.3" in README
+    if ($readmeContent -match 'v?(\d+\.\d+\.\d+)') {
+        $readmeVersions = [regex]::Matches($readmeContent, 'v?(\d+\.\d+\.\d+)') | 
+            ForEach-Object { $_.Groups[1].Value } | 
+            Select-Object -Unique
+        foreach ($rv in $readmeVersions) {
+            if ($rv -ne $versionFromFile -and $rv -match '^\d+\.\d+\.\d+$') {
+                # Only flag if it looks like a marge version (not dependency versions)
+                if ($readmeContent -match "marge.*$rv|$rv.*marge") {
+                    $versionMismatch = $true
+                }
+            }
+        }
+    }
+    Test-Check "README versions match VERSION file (no stale versions)" {
+        -not $versionMismatch
+    }
 }
 
 # ==============================================================================

@@ -1,0 +1,224 @@
+<#
+test-cli.ps1 - CLI Integration Tests
+
+Tests the marge CLI commands and flags work correctly.
+Does NOT require actual AI engines - tests help/version/init/clean/status.
+
+Usage:
+  powershell -ExecutionPolicy Bypass -File .\scripts\test-cli.ps1
+#>
+
+$ErrorActionPreference = "Stop"
+$script:TestsPassed = 0
+$script:TestsFailed = 0
+$script:StartTime = Get-Date
+
+# Dynamic folder detection
+$ScriptsDir = $PSScriptRoot
+$MsDir = (Get-Item $ScriptsDir).Parent.FullName
+$MsFolderName = Split-Path $MsDir -Leaf
+
+# ==============================================================================
+# VISUAL HELPERS
+# ==============================================================================
+
+function Write-Banner {
+    Write-Host ""
+    Write-Host "    +=========================================================================+" -ForegroundColor Cyan
+    Write-Host "    |                                                                         |" -ForegroundColor Cyan
+    Write-Host "    |    __  __    _    ____   ____ _____                                     |" -ForegroundColor Cyan
+    Write-Host "    |   |  \/  |  / \  |  _ \ / ___| ____|                                    |" -ForegroundColor Cyan
+    Write-Host "    |   | |\/| | / _ \ | |_) | |  _|  _|                                      |" -ForegroundColor Cyan
+    Write-Host "    |   | |  | |/ ___ \|  _ <| |_| | |___                                     |" -ForegroundColor Cyan
+    Write-Host "    |   |_|  |_/_/   \_\_| \_\\____|_____|                                    |" -ForegroundColor Cyan
+    Write-Host "    |                                                                         |" -ForegroundColor Cyan
+    Write-Host "    |                 C L I   I N T E G R A T I O N   T E S T S               |" -ForegroundColor Cyan
+    Write-Host "    |                                                                         |" -ForegroundColor Cyan
+    Write-Host "    +=========================================================================+" -ForegroundColor Cyan
+    Write-Host ""
+}
+
+function Write-Section([string]$Title) {
+    Write-Host ""
+    Write-Host "  +---------------------------------------------------------------------------+" -ForegroundColor DarkGray
+    Write-Host "  | " -NoNewline -ForegroundColor DarkGray
+    Write-Host "$Title".PadRight(73) -NoNewline -ForegroundColor White
+    Write-Host " |" -ForegroundColor DarkGray
+    Write-Host "  +---------------------------------------------------------------------------+" -ForegroundColor DarkGray
+}
+
+function Write-TestResult([string]$Name, [bool]$Passed, [string]$Detail = "") {
+    if ($Passed) {
+        Write-Host "    [PASS] " -NoNewline -ForegroundColor Green
+        Write-Host $Name -ForegroundColor Green
+    } else {
+        Write-Host "    [FAIL] " -NoNewline -ForegroundColor Red
+        Write-Host $Name -NoNewline -ForegroundColor Red
+        if ($Detail) {
+            Write-Host " ($Detail)" -ForegroundColor DarkRed
+        } else {
+            Write-Host ""
+        }
+    }
+}
+
+function Write-FinalSummary {
+    $elapsed = (Get-Date) - $script:StartTime
+    $duration = "{0:mm}m {0:ss}s" -f $elapsed
+    $success = $script:TestsFailed -eq 0
+    $total = $script:TestsPassed + $script:TestsFailed
+    
+    $borderColor = if ($success) { "Green" } else { "Red" }
+    
+    Write-Host ""
+    Write-Host "  +=========================================================================+" -ForegroundColor $borderColor
+    Write-Host "  |                       CLI TEST RESULTS                                  |" -ForegroundColor $borderColor
+    Write-Host "  +=========================================================================+" -ForegroundColor $borderColor
+    Write-Host "  |                                                                         |" -ForegroundColor $borderColor
+    
+    $statusText = if ($success) { "   STATUS:  [OK] ALL CLI TESTS PASSED" } else { "   STATUS:  [X] $($script:TestsFailed) TEST(S) FAILED" }
+    Write-Host "  |" -NoNewline -ForegroundColor $borderColor
+    Write-Host $statusText.PadRight(73) -NoNewline -ForegroundColor $borderColor
+    Write-Host " |" -ForegroundColor $borderColor
+    
+    Write-Host "  |                                                                         |" -ForegroundColor $borderColor
+    Write-Host "  +---------------------------------------------------------------------------+" -ForegroundColor $borderColor
+    Write-Host "  |   Passed: $($script:TestsPassed) | Failed: $($script:TestsFailed) | Duration: $duration".PadRight(74) -NoNewline
+    Write-Host " |" -ForegroundColor $borderColor
+    Write-Host "  +=========================================================================+" -ForegroundColor $borderColor
+    Write-Host ""
+}
+
+function Test-Assert {
+    param(
+        [string]$Name,
+        [scriptblock]$Test
+    )
+    
+    try {
+        $result = & $Test
+        if ($result -eq $true) {
+            $script:TestsPassed++
+            Write-TestResult -Name $Name -Passed $true
+            return $true
+        } else {
+            $script:TestsFailed++
+            Write-TestResult -Name $Name -Passed $false -Detail "returned: $result"
+            return $false
+        }
+    } catch {
+        $script:TestsFailed++
+        Write-TestResult -Name $Name -Passed $false -Detail $_.Exception.Message
+        return $false
+    }
+}
+
+# ==============================================================================
+# TESTS
+# ==============================================================================
+
+Write-Banner
+
+# Test Suite 1: Version and Help Commands
+Write-Section "Test Suite 1/4: Version and Help Commands"
+
+Test-Assert "marge.ps1 -Version runs without error" {
+    try {
+        & "$MsDir\cli\marge.ps1" @("-Version") 2>&1 | Out-Null
+        $true
+    } catch {
+        $false
+    }
+}
+
+Test-Assert "marge.ps1 -Help runs without error" {
+    try {
+        & "$MsDir\cli\marge.ps1" @("-Help") 2>&1 | Out-Null
+        $true
+    } catch {
+        $false
+    }
+}
+
+Test-Assert "marge.ps1 has VERSION variable" {
+    $content = Get-Content "$MsDir\cli\marge.ps1" -Raw
+    $content -match '\$script:VERSION\s*=' -or $content -match 'VERSION\s*='
+}
+
+Test-Assert "marge.ps1 has Show-Usage function" {
+    $content = Get-Content "$MsDir\cli\marge.ps1" -Raw
+    $content.Contains("function Show-Usage") -and $content.Contains("USAGE:")
+}
+
+# Test Suite 2: Status Command
+Write-Section "Test Suite 2/4: Status Command"
+
+Test-Assert "marge.ps1 status runs without error" {
+    try {
+        & "$MsDir\cli\marge.ps1" @("status") 2>&1 | Out-Null
+        $true
+    } catch {
+        $false
+    }
+}
+
+Test-Assert "marge.ps1 has Show-Status function" {
+    $content = Get-Content "$MsDir\cli\marge.ps1" -Raw
+    $content.Contains("function Show-Status") -and $content.Contains("Marge Status")
+}
+
+# Test Suite 3: DryRun and Mode Detection
+Write-Section "Test Suite 3/4: DryRun and Mode Detection"
+
+Test-Assert "marge.ps1 supports -DryRun parameter" {
+    $content = Get-Content "$MsDir\cli\marge.ps1" -Raw
+    $content -match '-DryRun'
+}
+
+Test-Assert "marge.ps1 has lite mode detection" {
+    $content = Get-Content "$MsDir\cli\marge.ps1" -Raw
+    $content.Contains("AGENTS-lite.md") -and $content.Contains("lite mode")
+}
+
+Test-Assert "marge.ps1 validates MARGE_HOME in lite mode" {
+    $content = Get-Content "$MsDir\cli\marge.ps1" -Raw
+    $content -match 'MARGE_HOME not found'
+}
+
+# Test Suite 4: AGENTS-lite.md in Shared Resources
+Write-Section "Test Suite 4/4: Shared Resources Check"
+
+Test-Assert "AGENTS-lite.md exists in repo root" {
+    Test-Path "$MsDir\AGENTS-lite.md"
+}
+
+Test-Assert "marge-init.ps1 includes AGENTS-lite.md in SharedLinks" {
+    $content = Get-Content "$MsDir\cli\marge-init.ps1" -Raw
+    $content -match "AGENTS-lite\.md"
+}
+
+Test-Assert "marge-init (bash) includes AGENTS-lite.md in SHARED_LINKS" {
+    $content = Get-Content "$MsDir\cli\marge-init" -Raw
+    $content -match "AGENTS-lite\.md"
+}
+
+Test-Assert "install-global.ps1 includes AGENTS-lite.md" {
+    $content = Get-Content "$MsDir\cli\install-global.ps1" -Raw
+    $content -match "AGENTS-lite\.md"
+}
+
+Test-Assert "install-global.sh includes AGENTS-lite.md" {
+    $content = Get-Content "$MsDir\cli\install-global.sh" -Raw
+    $content -match "AGENTS-lite\.md"
+}
+
+# ==============================================================================
+# SUMMARY
+# ==============================================================================
+
+Write-FinalSummary
+
+if ($script:TestsFailed -gt 0) {
+    exit 1
+}
+exit 0

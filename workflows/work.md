@@ -188,3 +188,19 @@ When delivering work, output:
 ```
 (Raw output or log path)
 ```
+
+---
+
+## After Work: Knowledge Capture
+
+After completing work (especially significant decisions or discoveries):
+
+1. Consider running `workflows/session_end.md` to capture:
+   - Decisions made during this work
+   - Patterns observed in the codebase
+   - User preferences expressed
+   - Insights about the project
+
+2. This keeps knowledge files populated for future sessions
+
+**Skip if:** Trivial fix with no learning/decisions.

@@ -22,6 +22,36 @@ Consider: Capture knowledge → Start new conversation → Reference captured kn
 
 ---
 
+## Phase 0: Check If Knowledge Needs Seeding (First-Time Setup)
+
+Before extracting new facts, check if knowledge files are empty:
+
+```powershell
+# Check entry counts in _index.md
+Select-String -Path "knowledge/_index.md" -Pattern "entries$"
+```
+
+If all counts show 0, this is a fresh installation. Consider seeding with:
+
+1. **Project defaults** — Common decisions visible in codebase:
+   - Language/framework choices (visible in package.json, requirements.txt, etc.)
+   - Code style decisions (visible in linter configs)
+   - Architecture patterns (visible in folder structure)
+
+2. **Inferred user preferences** — From this session's interactions:
+   - Communication style (verbose vs concise)
+   - Level of detail requested
+   - Testing preferences (TDD vs test-after)
+
+3. **Workspace insights** — Observable facts about the codebase:
+   - Major modules/services discovered
+   - Key entry points identified
+   - Non-obvious dependencies noticed
+
+**Seed 2-3 entries per category max.** Seeding is bootstrapping, not comprehensive documentation.
+
+---
+
 ## Phase 1: Extract Atomic Facts
 
 Scan the session and extract **discrete, standalone facts**:

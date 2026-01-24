@@ -307,17 +307,26 @@ function Invoke-Task {
     }
 
     if ($useLiteMode) {
+        # Validate MARGE_HOME exists for lite mode
+        if (-not (Test-Path $script:MARGE_HOME)) {
+            Write-Err "MARGE_HOME not found: $($script:MARGE_HOME)"
+            Write-Err "Install marge globally first, or set MARGE_HOME to your installation."
+            return $false
+        }
+        
         # Lite mode - use AGENTS-lite.md content directly
         $agentsLitePath = Join-Path $script:MARGE_HOME "shared\AGENTS-lite.md"
         if (-not (Test-Path $agentsLitePath)) {
             $agentsLitePath = Join-Path $script:MARGE_HOME "AGENTS-lite.md"
         }
         
-        $agentsContent = if (Test-Path $agentsLitePath) {
-            Get-Content $agentsLitePath -Raw
-        } else {
-            "Be concise. Do the task directly. List files modified."
+        if (-not (Test-Path $agentsLitePath)) {
+            Write-Err "AGENTS-lite.md not found in $($script:MARGE_HOME)"
+            Write-Err "Your marge installation may be incomplete. Try reinstalling."
+            return $false
         }
+        
+        $agentsContent = Get-Content $agentsLitePath -Raw
         
         $prompt = @"
 Read and follow these rules:
